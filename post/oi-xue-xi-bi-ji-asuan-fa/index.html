@@ -1,0 +1,3567 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="keywords" content="Gridea静态个人博客">
+<meta name="description" content="恭喜你！发现了Crystal_gan的后花园">
+<meta name="theme-color" content="#f8f9fa">
+<title>【OI学习笔记】A*算法 | Crystal_gan</title>
+<link rel="shortcut icon" href="/favicon.ico?v=1650260170296">
+<link rel="stylesheet" href="/media/css/gemini.css">
+<link rel="stylesheet" href="/media/fonts/font-awesome.css">
+<link
+  href="//fonts.loli.net/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Rosario:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext"
+  rel="stylesheet" type="text/css">
+
+<link href="/media/hljs/styles/default.css"
+  rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/themes/" rel="stylesheet" />
+
+<link rel="stylesheet" href="/styles/main.css">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script src="/media/js/jquery.js"></script>
+<script src="/media/hljs/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.0/velocity.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.0/velocity.ui.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css"
+  integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"
+  integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"
+  integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+  onload="renderMathInElement(document.body);"></script>
+
+
+
+
+
+
+  <meta name="description" content="【OI学习笔记】A*算法" />
+  <meta name="keywords" content="A*算法,搜索,OI学习笔记" />
+</head>
+
+<body>
+  <div class="head-top-line"></div>
+  <div class="header-box">
+    
+<div class="gemini">
+  <header class="header  ">
+    <div class="blog-header box-shadow-wrapper bg-color " id="header">
+      <div class="nav-toggle" id="nav_toggle">
+        <div class="toggle-box">
+          <div class="line line-top"></div>
+          <div class="line line-center"></div>
+          <div class="line line-bottom"></div>
+        </div>
+      </div>
+      <div class="site-meta">       
+        <div class="site-title">
+          
+            <a href="/" class="brand">
+              <span>Crystal_gan</span>
+            </a>  
+          
+        </div>
+        
+          <p class="subtitle">恭喜你！发现了Crystal_gan的后花园</p>
+        
+      </div>
+      <nav class="site-nav" id="site_nav">
+        <ul id="nav_ul">
+          
+            
+            
+              
+            
+            <li class="nav-item ">
+              
+              
+                <a href="https://song-gan.github.io" target="_self">
+                  <i class="fa fa-globe"></i> 首页
+                </a>
+              
+            </li>
+          
+            
+            
+              
+            
+            <li class="nav-item ">
+              
+              
+                <a href="https://song-gan.github.io/archives" target="_self">
+                  <i class="fa fa-archive"></i> 归档
+                </a>
+              
+            </li>
+          
+            
+            
+              
+            
+            <li class="nav-item ">
+              
+              
+                <a href="https://song-gan.github.io/tags" target="_self">
+                  <i class="fa fa-tags"></i> 标签
+                </a>
+              
+            </li>
+          
+            
+            
+              
+            
+            <li class="nav-item ">
+              
+              
+                <a href="https://song-gan.github.io/post/about" target="_self">
+                  <i class="fa fa-user"></i> 关于
+                </a>
+              
+            </li>
+          
+          
+            
+              <li class="nav-item ">
+                <a href="/friends/" target="_blank">
+                  
+                    <i class="fa fa-address-book"></i> 友链
+                  
+                </a>
+              </li>
+            
+          
+          
+            <li id="fa_search" class="nav-item">
+              <a href="javascript:void(0);">
+                <i class="fa fa-search"></i> <span class="language" data-lan="search">搜索</span>
+              </a>
+            </li>
+          
+        </ul>
+      </nav>
+    </div>
+  </header>
+</div>
+
+<script type="text/javascript"> 
+ 
+  let showNav = true;
+
+  let navToggle = document.querySelector('#nav_toggle'),
+  siteNav = document.querySelector('#site_nav');
+  
+  function navClick() {
+    let sideBar = document.querySelector('.sidebar');
+    let navUl = document.querySelector('#nav_ul');
+    navToggle.classList.toggle('nav-toggle-active');
+    siteNav.classList.toggle('nav-menu-active');
+    if (siteNav.classList.contains('nav-menu-active')) {
+      siteNav.style = "height: " + (navUl.children.length * 42) +"px !important";
+    } else {
+      siteNav.style = "";
+    }
+  }
+
+  navToggle.addEventListener('click',navClick);  
+</script>
+  </div>
+  <div class="main-continer">
+    
+    <div
+      class="section-layout gemini ">
+      <div class="section-layout-wrapper">
+        
+
+<div class="sidebar">
+  
+    <div class="sidebar-box box-shadow-wrapper bg-color right-motion" id="sidebar">
+      
+        <div class="post-list-sidebar">
+          <div class="sidebar-title">
+            <span id="tocSideBar" class="sidebar-title-item sidebar-title-active language" data-lan="index">文章目录</span>
+            <span id="metaSideBar" class="sidebar-title-item language" data-lan="preview">站点概览</span>
+          </div>
+        </div>
+      
+      <div class="sidebar-body gemini" id="sidebar_body">
+        
+          
+            <div class="post-side-meta" id="post_side_meta">
+              
+<div class="sidebar-wrapper box-shadow-wrapper bg-color">
+  <div class="sidebar-item">
+    <img class="site-author-image right-motion" src="/images/avatar.png"/>
+    <p class="site-author-name">Crystal_gan</p>
+    
+    <div class="site-description right-motion">
+      
+        <p id="binft">Do not touch my heart easily, it is as fragile as crystal.\nDo not trifle with my heart, it is pure as crystal.</p>
+      
+    </div>
+    
+  </div>
+  <div class="sidebar-item side-item-stat right-motion">
+    <div class="sidebar-item-box">
+      <a href="/archives/">
+        
+        <span class="site-item-stat-count">10</span>
+        <span class="site-item-stat-name language" data-lan="article">文章</span>
+      </a>
+    </div>
+    <div class="sidebar-item-box">
+      <a href="/tags/">
+        <span class="site-item-stat-count">13</span>
+        <span class="site-item-stat-name language" data-lan="tag">标签</span>
+      </a>
+    </div>
+  </div>
+  
+    
+      <div class="sidebar-item">
+        <span class="site-item-rss">
+            <i class="fa fa-rss"></i>
+            <a href="https://song-gan.github.io/atom.xml" target="_blank">RSS</a>
+        </span>
+      </div>
+    
+  
+  
+
+
+
+  <div style="width: 100%; position: relative;">
+    <canvas id="canvasDiyBlock" style="width:100%;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+    <script src="/media/js/magic/clock.js"></script>
+  </div>
+
+</div>
+            </div>
+            <div class="post-toc sidebar-body-active" id="post_toc" style="opacity: 1;">
+              <div class="toc-box right-motion">
+  <div class="toc-wrapper  auto"
+    id="toc_wrapper">
+    <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#a%E7%AE%97%E6%B3%95">A*算法</a></li>
+<li><a href="#%E4%BE%8B%E9%A2%98%E7%AC%ACk%E7%9F%AD%E8%B7%AF">【例题】第k短路</a>
+<ul>
+<li><a href="#%E9%A2%98%E8%A7%A3">题解</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+</div>
+
+<script>
+
+  let lastTop = 0, lList = [], hList = [], postBody, lastIndex = -1;
+  let active = 'active-show', activeClass = 'active-current';
+  let tocWrapper = document.querySelector('#toc_wrapper');
+  let tocContent = tocWrapper.children[0];
+  let autoNumber = tocWrapper && tocWrapper.classList.contains('auto-number');
+
+  function addTocNumber(elem, deep) {
+    if (!elem) {
+      return;
+    }
+    let prop = elem.__proto__;
+
+    if (prop === HTMLUListElement.prototype) {
+      for (let i = 0; i < elem.children.length; i++) {
+        addTocNumber(elem.children[i], deep + (i + 1) + '.');
+      }
+    } else if (prop === HTMLLIElement.prototype) {
+      // 保存li元素
+      if (elem.children[0] && elem.children[0].__proto__ === HTMLAnchorElement.prototype) {
+        lList.push(elem);
+      }
+      for (let i = 0; i < elem.children.length; i++) {
+        let cur = elem.children[i];
+        if (cur.__proto__ === HTMLAnchorElement.prototype) {
+          if (autoNumber) {
+            cur.text = deep + ' ' + cur.text;
+          }
+        } else if (cur.__proto__ === HTMLUListElement.prototype) {
+          addTocNumber(cur, deep);
+        }
+      }
+    }
+  }
+
+  function removeParentActiveClass() {
+    let parents = tocContent.querySelectorAll('.' + active)
+    parents.forEach(function (elem) {
+      elem.classList.remove(active);
+    });
+  }
+
+  function addActiveClass(index) {
+    if (index >= 0 && index < hList.length) {
+      lList[index].classList.add(activeClass);
+    }
+  }
+
+  function removeActiveClass(index) {
+    if (index >= 0 && index < hList.length) {
+      lList[index].classList.remove(activeClass);
+    }
+  }
+
+  function addActiveLiElemment(elem, parent) {
+    if (!elem || elem === parent) {
+      return;
+    } else {
+      if (elem.__proto__ === HTMLLIElement.prototype) {
+        elem.classList.add(active);
+      }
+      addActiveLiElemment(elem.parentElement, parent);
+    }
+  }
+
+  function showToc() {
+    if (tocWrapper) {
+      postBody = document.querySelector('#post_body');
+      for (let i = 0; i < postBody.children.length; i++) {
+        if (postBody.children[i].__proto__ === HTMLHeadingElement.prototype) {
+          hList.push(postBody.children[i]);
+        }
+      }
+      if (tocWrapper.classList.contains('compress')) {
+        tocContent.classList.add('closed');
+      } else if (tocWrapper.classList.contains('no_compress')) {
+        tocContent.classList.add('expanded');
+      } else {
+        if (hList.length > 10) {
+          active = 'active-hidden'
+          tocContent.classList.add('closed');
+        } else {
+          tocContent.classList.add('expanded');
+        }
+      }
+    }
+  }
+
+  (function () {
+    // 处理不是从#一级标题开始目录
+    if (tocContent.children.length === 1 && tocContent.children[0].__proto__ === HTMLLIElement.prototype) {
+      let con = tocContent.children[0].children[0];
+      tocContent.innerHTML = con.innerHTML;
+    }
+    let markdownItTOC = document.querySelector('.markdownIt-TOC');
+    let innerHeight = window.innerHeight;
+    markdownItTOC.style = `max-height: ${innerHeight - 80 > 0 ? innerHeight - 80 : innerHeight}px`
+    addTocNumber(tocContent, '');
+  })();
+
+  document.addEventListener('scroll', function (e) {
+    if (lList.length <= 0) {
+      return;
+    }
+    let scrollTop = document.scrollingElement.scrollTop + 10;
+    let dir;
+
+    if (lastTop - scrollTop > 0) {
+      dir = 'up';
+    } else {
+      dir = 'down';
+    }
+
+    lastTop = scrollTop;
+    if (scrollTop <= 0) {
+      if (lastIndex >= 0 && lastIndex < hList.length) {
+        lList[lastIndex].classList.remove(activeClass);
+      }
+      return;
+    }
+
+    let current = 0, hasFind = false;
+    for (let i = 0; i < hList.length; i++) {
+      if (hList[i].offsetTop > scrollTop) {
+        current = i;
+        hasFind = true;
+        break;
+      }
+    }
+    if (!hasFind && scrollTop > lList[lList.length - 1].offsetTop) {
+      current = hList.length - 1;
+    } else {
+      current--;
+    }
+    if (dir === 'down') {
+      if (current > lastIndex) {
+        addActiveClass(current);
+        removeActiveClass(lastIndex)
+        lastIndex = current;
+        removeParentActiveClass();
+        lList[current] && addActiveLiElemment(lList[current].parentElement, tocContent);
+      }
+    } else {
+      if (current < lastIndex) {
+        addActiveClass(current);
+        removeActiveClass(lastIndex);
+        lastIndex = current;
+        removeParentActiveClass();
+        lList[current] && addActiveLiElemment(lList[current].parentElement, tocContent);
+      }
+    }
+  });
+
+
+  window.addEventListener('load', function () {
+    showToc();
+    document.querySelector('#sidebar').style = 'display: block;';
+    tocWrapper.classList.add('toc-active');
+    setTimeout(function () {
+      if ("createEvent" in document) {
+        let evt = document.createEvent("HTMLEvents");
+        evt.initEvent("scroll", false, true);
+        document.dispatchEvent(evt);
+      }
+      else {
+        document.fireEvent("scroll");
+      }
+    }, 500)
+  })
+
+</script>
+            </div>
+          
+        
+      </div>
+    </div>
+  
+</div>
+<script>
+  const SIDEBAR_TITLE_ACTIVE = 'sidebar-title-active';
+  const SIDEBAR_BODY_ACTIVE = 'sidebar-body-active';
+  const SLIDE_UP_IN = 'slide-up-in';
+
+  let sidebar = document.querySelector('#sidebar'),
+  tocSideBar = document.querySelector('#tocSideBar'),
+  metaSideBar = document.querySelector('#metaSideBar'),
+  postToc = document.querySelector('#post_toc'),
+  postSiteMeta = document.querySelector('#post_side_meta'),
+  sidebarTitle = document.querySelector('.sidebar-title'),
+  sidebarBody = document.querySelector('#sidebar_body');
+
+  tocSideBar && tocSideBar.addEventListener('click', (e) => {
+    toggleSidebar(e);
+  });
+
+  metaSideBar && metaSideBar.addEventListener('click', (e) => {
+    toggleSidebar(e);
+  });
+
+  function toggleSidebar(e) {
+    let currentTitle = document.querySelector("."+SIDEBAR_TITLE_ACTIVE);
+    if (currentTitle == e.srcElement) {
+      return ;
+    }
+    let current, showElement, hideElement;
+    if (e.srcElement == metaSideBar) {
+      showElement = postSiteMeta;
+      hideElement = postToc;
+    } else if (e.srcElement == tocSideBar){
+      showElement = postToc;
+      hideElement = postSiteMeta;
+    }
+    currentTitle.classList.remove(SIDEBAR_TITLE_ACTIVE);
+    e.srcElement.classList.add(SIDEBAR_TITLE_ACTIVE);
+
+    jQuery.Velocity(hideElement, 'stop');
+    jQuery.Velocity(hideElement, 'transition.slideUpOut', {
+      display: 'none',
+      duration: 200,
+      complete: function () {
+        jQuery.Velocity(showElement, 'transition.slideDownIn', {
+          duration: 200
+        });
+      }
+    })
+    hideElement.classList.remove(SIDEBAR_BODY_ACTIVE);
+    showElement.classList.add(SIDEBAR_BODY_ACTIVE);
+  }
+
+  postToc && postToc.addEventListener('transitionend', function() {
+    this.classList.remove(SLIDE_UP_IN);
+  });
+
+  if (sidebarBody) {
+    if (sidebarBody.classList.contains('pisces') || sidebarBody.classList.contains('gemini')) {
+      let hasFix = false;
+      let scrollEl = document.querySelector('.main-continer');
+      let limitTop = document.querySelector('#nav_ul').children.length * 42 + 162;
+      window.addEventListener('scroll', function(e) {
+        if (document.scrollingElement.scrollTop >= limitTop) {
+          if (!hasFix) {
+            sidebar.classList.add('sidebar-fixed');
+            hasFix = true;
+          }
+        } else {
+          if (hasFix) {
+            sidebar.classList.remove('sidebar-fixed');
+            hasFix = false;
+          }
+        }
+      });
+    }
+  }
+  
+</script>
+        <div class="section-box box-shadow-wrapper">
+          <div class="section bg-color post post-page">
+            <section class="post-header">
+  <h1 class="post-title">
+    <a class="post-title-link" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-asuan-fa/"> 【OI学习笔记】A*算法 </a>
+  </h1>
+  <div class="post-meta">
+    
+    <span class="meta-item pc-show">
+      <i class="fa fa-calendar-o"></i>
+      <span class="language" data-lan="publish">发布于</span>
+      <span class="publish-time" data-t="2022-03-03 13:05:58">2022-03-03</span>
+      <span class="post-meta-divider pc-show">|</span>
+    </span>
+    
+    <span class="meta-item">
+      <i class="fa fa-folder-o"></i>
+      <span class="pc-show language" data-lan="category-in">标签:</span>
+       
+      <a href="https://song-gan.github.io/tag/MdQWxPmon/"> <span>A*算法</span> </a>、   
+      <a href="https://song-gan.github.io/tag/lUhD0gEPY/"> <span>搜索</span> </a>、   
+      <a href="https://song-gan.github.io/tag/tf0hEsZbl/">
+        <span>OI学习笔记</span>
+      </a>
+       
+    </span>
+    <span class="post-meta-divider">|</span>
+    
+    <span class="meta-item">
+      <i class="fa fa-clock-o"></i>
+      <span
+        >8<span class="language" data-lan="minute"
+          >分钟</span
+        ></span
+      >
+    </span>
+    <span class="meta-item">
+      <span class="post-meta-divider">|</span>
+      <i class="fa fa-file-word-o"></i>
+      <span
+        >1842<span class="pc-show language" data-lan="words"
+          >字数</span
+        ></span
+      >
+    </span>
+      
+    <span
+      id="/post/oi-xue-xi-bi-ji-asuan-fa/"
+      data-flag-title="【OI学习笔记】A*算法"
+      class="meta-item pc-show leancloud_visitors"
+    >
+      <span class="post-meta-divider">|</span>
+      <i class="fa fa-eye"></i>
+      <span
+        ><span class="language" data-lan="view">浏览量:</span>:<span
+          class="leancloud-visitors-count"
+        ></span
+      ></span>
+    </span>
+    
+  </div>
+</section>
+
+            <div class="post-body next-md-body" id="post_body">
+              <h2 id="a算法">A*算法</h2>
+<ul>
+<li>
+<p>我们知道BFS是一种“盲目”的搜索技术，它在搜索过程中并不会理会目标在哪里，只顾自己走，当然最后总会到达终点，但是时间空间复杂度就很难说了。</p>
+</li>
+<li>
+<p>比如说举个例子：你要从家到学校，现在有很多的路可以选择，对于聪明的你来说当然可以准确地选择最短的路，因为你毕竟不是个瞎子，能看见路途中你距离学校的距离，能够判断思考，可以随时调整新的路径。但是，对程序来说它很呆板，对于一般的BFS它会扩展各个方向尝试去搜索，哪怕是与目标背道而行，越走越远，所以我们为了让程序不去做这些不必要的搜索，可以考虑将我们的“智慧”交给程序，知道应该朝目标方向去搜索，那么这就是“启发式搜索”。这一节我们将学习其中比较简单的一种A*算法。</p>
+</li>
+<li>
+<p>通俗说，A*算法其实就是“BFS + 贪心”。</p>
+</li>
+<li>
+<p>在具体探讨A*算法前，我们先回顾一下上一节的优先队列BFS算法。该算法维护了一个优先队列(二叉堆)，不断从堆中取出“当前代价最小”的状态(堆顶)进行扩展。每个状态被第一次从优先队中取出时，就得了从初始状态到该状态的最小代价。</p>
+</li>
+<li>
+<p>那么如果给定一个“目标状态”，需要求出从初始到目标状态的最小代价，那么优先队列BFS的这个“优先策略”是有局限性的。一个状态的当前代价最小，我们只能说从初始状态到该状态的代价最小，但在未来的搜索中我们不能保证这就是最优的，可能从该状态到目标状态会花费很大的代价。相反，一些状态在当前代价略大，但它能成为全局的最优解。优先队列BFS最终是可以求出全局的最优解，因为它的一个状态的最优解是在不断更新的。但是在搜索中它会优先选择前者的分支，这就会导致求出最优解的搜索量增大，在时间与空间的复杂度上增大许多。其实A*算法与这有点类似于“动态规划”与“贪心”的区别。</p>
+</li>
+<li>
+<p>再回到刚刚的例子，我们可以将从家到学校的路看最网格状的图，此时我们要曼哈顿距离的概念：曼哈顿距离——两点在横纵方向差的和，即d（i，j）=|xi-xj|+|yi-yj|。对于一个具备正南正北、正东正西方向规则布局的城镇街道，从一点到达另外一点的距离正是在南北方向上旅行的距离加上在东西方向上旅行的距离，所以，曼哈顿距离又称为出租车距离。</p>
+</li>
+</ul>
+<figure data-type="image" tabindex="1"><img src="https://www.imageoss.com/images/2022/03/03/1992968c31aa9a86b.png" alt="曼哈顿距离" loading="lazy"></figure>
+<ul>
+<li>
+<p>为了我们搜索的效率，我们很自然可以想到，可以对未来可能产生的代价进行评估。那么我们就需要设计一个“估价函数”，它的功能主要是评估从当前任意状态到目标状态所需代价的估计值。在搜索中，仍要我们去维护一个堆，不断从堆中取出“当前代价+未来估价”最小的状态进行接下来的扩展搜索。为了摆正第一次从堆中取出目标状态是得到的就是最优解，我们设计的估价函数必须要满足一个基本准则：</p>
+</li>
+<li>
+<p>设是当前所在的状态，是对的评估函数；</p>
+</li>
+<li>
+<p>那么满足：</p>
+</li>
+<li>
+<p>表示从初始状态到达当前状态的实际代价，它不体现当前状态与目标的关系；</p>
+</li>
+<li>
+<p>表示从当前状态到目标的最优路径的评估，它实际就是“启发式”信息，我们把成为启发函数，很显然决定了A*算法的优劣。</p>
+</li>
+<li>
+<p>特别注意:不能漏掉最优解。</p>
+</li>
+<li>
+<p>在之前从学校到家的例子中，我们需要用到的启发函数就是曼哈顿距离，这里为什么用曼哈顿距离作为启发函数请同学们自己思考。</p>
+</li>
+<li>
+<p>回头再看，我们说到A*算法通俗的说其实就是“BFS + 贪心”：</p>
+</li>
+</ul>
+<ol>
+<li>
+<p>如果，有，这其实就是不同的BFS算法，会访问大量方块。</p>
+</li>
+<li>
+<p>如果，有，这其实就是贪心算法，这就会导致在扩展时，只注重与局部的最优解，达不到全局的最优解。更有可能陷入一个状态就出不来了。</p>
+</li>
+</ol>
+<ul>
+<li>综上，A*算法提高搜索效率的关键，就在于能否设计出一个优秀的估价函数。在满足基本准则的前提下，还应该尽可能反映未来实际代价的变化趋势和相对大小关系，这样搜索才会较快地逼近最优解。</li>
+</ul>
+<h2 id="例题第k短路"><a href="https://www.acwing.com/problem/content/180/">【例题】第k短路</a></h2>
+<h3 id="题解">题解</h3>
+<pre><code class="language-cpp">//DC Songxingan
+#include &lt;iostream&gt;
+#include &lt;cmath&gt;
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+#include &lt;cstring&gt;
+#include &lt;algorithm&gt;
+#include &lt;queue&gt;
+#define PII pair&lt;int, int&gt;
+#define PIII pair&lt;int, PII&gt;
+#define x first
+#define y second
+using namespace std;
+
+const int N = 1010, M = 2e5 + 10;
+int n, m, S, T, K;
+int h[N], rh[N], e[M], w[M], ne[M], idx;
+int dist[N];
+bool st[N]; // 每个点用没用过
+
+void add(int h[], int a, int b, int c)
+{
+    e[idx] = b, w[idx] = c, ne[idx] = h[a], h[a] = idx++;
+}
+// 在反向图上dijkstra()，保存估价函数(dist[]距离)
+// dist存的是该点到终点的最小距离
+
+void dijkstra()
+{
+    priority_queue&lt;PII, vector&lt;PII&gt;, greater&lt;PII&gt;&gt; heap; // 优先队列，小根堆
+    heap.push({0, T});                                   //终点T是这里的起点 &lt;距离，点编号&gt;
+    memset(dist, 0x3f, sizeof dist);
+    dist[T] = 0;
+    while (heap.size())
+    {
+        auto t = heap.top();
+        heap.pop();
+        int ver = t.y;
+        if (st[ver])
+            continue;
+        st[ver] = true; // 遍历过
+        // 在反向图上遍历，rh[]数组
+        for (int i = rh[ver]; i != -1; i = ne[i])
+        {
+            int j = e[i];
+            if (dist[j] &gt; dist[ver] + w[i])
+            {
+                dist[j] = dist[ver] + w[i];
+                heap.push({dist[j], j});
+            }
+        }
+    }
+}
+
+int astar()
+{
+    //
+    priority_queue&lt;PIII, vector&lt;PIII&gt;, greater&lt;PIII&gt;&gt; heap;
+    // A* 算法，从起点开始搜
+    heap.push({dist[S], {0, S}}); // 估价值，{真实值，编号}
+    int cnt = 0;                  // 终点遍历几次
+    // 无解的话，返回-1
+
+    if (dist[S] == 0x3f3f3f3f)
+        return -1;
+
+    while (heap.size())
+    {
+        auto t = heap.top();
+        heap.pop();
+        int ver = t.y.y, distance = t.y.x; //从起点到该点的真实距离
+        if (ver == T)
+            cnt++; // 遍历一遍终点， cnt++，直到第K次
+        // 这个点是终点，并且是第k短路，直接返回第k短路的真实距离distance
+        if (cnt == K)
+            return distance;
+
+        // 正向扩展所有的边
+        // 用 起点到该点的真实距离+ 该点到终点的估价距离来作为标准
+        // distance + w[i] + dist[j]
+        for (int i = h[ver]; i != -1; i = ne[i])
+        {
+            int j = e[i];
+            heap.push({distance + w[i] + dist[j], {distance + w[i], j}});
+        }
+    }
+
+    return -1;
+}
+
+int main()
+{
+    scanf(&quot;%d%d&quot;, &amp;n, &amp;m);
+    // 初始化表头
+    memset(h, -1, sizeof h);
+    memset(rh, -1, sizeof rh);
+    for (int i = 1; i &lt;= m; i++)
+    {
+        int a, b, c;
+        scanf(&quot;%d%d%d&quot;, &amp;a, &amp;b, &amp;c);
+        add(h, a, b, c);  // 建正边
+        add(rh, b, a, c); // 建反边
+    }
+    scanf(&quot;%d%d%d&quot;, &amp;S, &amp;T, &amp;K);
+    if (S == T)
+        K++;
+
+    dijkstra();
+    printf(&quot;%d\n&quot;, astar());
+}
+
+</code></pre>
+
+            </div>
+            
+              <div class="reward-btn">
+                <div class="reward-btn-text">赞赏</div>
+              </div>
+            
+            
+              <div class="post-footer">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+      <strong class="language" data-lan="author">本文作者：</strong>
+      Crystal_gan
+    </li>
+    <li class="post-copyright-link">
+      <strong class="language" data-lan="link">本文链接：</strong>
+      <a href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-asuan-fa/" title="【OI学习笔记】A*算法">https://song-gan.github.io/post/oi-xue-xi-bi-ji-asuan-fa/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong class="language" data-lan="copyright">版权声明： </strong>
+      本博客所有文章除特别声明外，均采用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i> BY-NC-SA</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+  <div class="tags">
+    
+      <a href="https://song-gan.github.io/tag/MdQWxPmon/"># A*算法</a>
+    
+      <a href="https://song-gan.github.io/tag/lUhD0gEPY/"># 搜索</a>
+    
+      <a href="https://song-gan.github.io/tag/tf0hEsZbl/"># OI学习笔记</a>
+    
+  </div>
+  <div class="nav">
+    <div class="nav-prev">
+      
+        <i class="fa fa-chevron-left"></i>
+        <a class="nav-pc-next" title="【OI学习笔记】迭代加深搜索" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-die-dai-jia-shen-sou-suo/">【OI学习笔记】迭代加深搜索</a class="nav-pc-next">
+        <a class="nav-mobile-prev" title="【OI学习笔记】迭代加深搜索" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-die-dai-jia-shen-sou-suo/">上一篇</a>
+      
+    </div>
+    <div class="nav-next">
+      
+        <a class="nav-pc-next" title="【OI学习笔记】双向BFS" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-shuang-xiang-bfs/">【OI学习笔记】双向BFS</a>
+        <a class="nav-mobile-next" title="【OI学习笔记】双向BFS" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-shuang-xiang-bfs/">下一篇</a>
+        <i class="fa fa-chevron-right"></i>
+      
+    </div>
+  </div>
+</div>
+            
+            
+  
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-box">
+  <footer class="footer">
+    <center id="runTimeBox">
+      已运行:<span id="run_time"></span>
+    </center>
+    <span id="busuanzi_container_site_pv">浏览数:<span id="busuanzi_value_site_pv"></span> 次</span>
+    <span class="post-meta-divider">|</span>
+    <span id="busuanzi_container_site_uv">访客数:<span id="busuanzi_value_site_uv"></span> 人</span>
+
+    <script>
+      BirthDay = new Date('');
+      if (BirthDay.getTime()) {
+        function runTime() {
+          str = "";
+          today = new Date();
+          timeold = today.getTime() - BirthDay.getTime();
+          msPerDay = 24 * 60 * 60 * 1000;
+          e_daysold = timeold / msPerDay;
+          daysold = Math.floor(e_daysold);
+          str += daysold + "天";
+          return str;
+        }
+        setInterval(function () {
+          $("#run_time").html(runTime());
+        }, 1000);
+      } else {
+        document.querySelector('.footer').removeChild(document.querySelector('#runTimeBox'));
+      }
+    </script>
+    <div class="poweredby">
+      Powered by <a href="https://www.luogu.com.cn/user/109660" target="_blank">凌寒</a>
+    </div>
+  </footer>
+  
+    
+        <div class="gemini back-to-top" id="back_to_top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span class="scrollpercent"> <span id="back_to_top_text">0</span>% </span>
+            
+        </div>
+        
+          
+            
+              <div class="bg-img">
+                <img src="https://www.imageoss.com/images/2022/02/14/-5afb139d3bd45c6e9.jpg" />
+              </div>
+              
+                
+                  
+                    
+<link rel="stylesheet" href="/media/live2d/css/live2d.css" />
+<div class="box-scale">
+  <div id="landlord" style="left: 1000px;bottom: 20px;"
+    data-key="">
+    <canvas id="live2d" width="500" height="560" class="live2d"></canvas>
+    
+
+      <div class="message" style="opacity:0"></div>
+      <div class="live_talk_input_body">
+        <div class="live_talk_input_name_body">
+          <input name="name" type="text" class="live_talk_name white_input" id="AIuserName" autocomplete="off"
+            placeholder="你的名字" />
+        </div>
+        <div class="live_talk_input_text_body">
+          <input name="talk" type="text" class="live_talk_talk white_input" id="AIuserText" autocomplete="off"
+            placeholder="要和我聊什么呀？" />
+          <button type="button" class="live_talk_send_btn" id="talk_send">发送</button>
+        </div>
+      </div>
+      <input name="live_talk" id="live_talk" value="1" type="hidden" />
+      <div class="live_ico_box">
+        <div class="live_ico_item type_info" id="showInfoBtn"></div>
+        <div class="live_ico_item type_talk" id="showTalkBtn"></div>
+        
+        <div class="live_ico_item type_youdu" id="youduButton"></div>
+        <div class="live_ico_item type_quit" id="hideButton"></div>
+        <input name="live_statu_val" id="live_statu_val" value="0" type="hidden" />
+        <audio src="" style="display:none;" id="live2d_bgm" data-bgm="0" preload="none"></audio>
+        <input id="duType" value="douqilai" type="hidden">
+        
+      </div>
+    
+  </div>
+</div>
+<div id="open_live2d">召唤看板娘</div>
+<script>
+  var message_Path = 'https://cdn.jsdelivr.net/gh/hsxyhao/live2d.github.io@master/';
+  let landlord = document.querySelector('#landlord');
+  var apiKey = landlord.dataset.key;
+</script>
+<script type="text/javascript" src="/media/live2d/js/live2d.js"></script>
+<script>
+	var home_Path = document.location.protocol + '//' + window.document.location.hostname + ":" + window.document.location.port + '/';
+	var userAgent = window.navigator.userAgent.toLowerCase();
+	var norunAI = ["android", "iphone", "ipod", "ipad", "windows phone", "mqqbrowser", "msie", "trident/7.0"];
+	var norunFlag = false;
+
+	for (var i = 0; i < norunAI.length; i++) {
+		if (userAgent.indexOf(norunAI[i]) > -1) {
+			norunFlag = true;
+			break;
+		}
+	}
+
+	if (!window.WebGLRenderingContext) {
+		norunFlag = true;
+	}
+
+	if (!norunFlag) {
+		var hitFlag = false;
+		var AIFadeFlag = false;
+		var liveTlakTimer = null;
+		var sleepTimer_ = null;
+		var AITalkFlag = false;
+		var talkNum = 0;
+		(function () {
+			function renderTip(template, context) {
+				var tokenReg = /(\\)?\{([^\{\}\\]+)(\\)?\}/g;
+				return template.replace(tokenReg, function (word, slash1, token, slash2) {
+					if (slash1 || slash2) {
+						return word.replace('\\', '');
+					}
+					var variables = token.replace(/\s/g, '').split('.');
+					var currentObject = context;
+					var i, length, variable;
+					for (i = 0, length = variables.length; i < length; ++i) {
+						variable = variables[i];
+						currentObject = currentObject[variable];
+						if (currentObject === undefined || currentObject === null) return '';
+					}
+					return currentObject;
+				});
+			}
+
+			String.prototype.renderTip = function (context) {
+				return renderTip(this, context);
+			};
+
+			var re = /x/;
+			re.toString = function () {
+				showMessage('哈哈，你打开了控制台，是想要看看我的秘密吗？', 5000);
+				return '';
+			};
+
+			$(document).on('copy', function () {
+				showMessage('你都复制了些什么呀，转载要记得加上出处哦~~', 5000);
+			});
+
+			function initTips() {
+				$.ajax({
+					cache: true,
+					url: message_Path + 'message.json',
+					dataType: "json",
+					success: function (result) {
+						$.each(result.mouseover, function (index, tips) {
+							$(tips.selector).mouseover(function () {
+								var text = tips.text;
+								if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
+								text = text.renderTip({ text: $(this).text() });
+								showMessage(text, 3000);
+								talkValTimer();
+								clearInterval(liveTlakTimer);
+								liveTlakTimer = null;
+							});
+							$(tips.selector).mouseout(function () {
+								showHitokoto();
+								if (liveTlakTimer == null) {
+									liveTlakTimer = window.setInterval(function () {
+										showHitokoto();
+									}, 15000);
+								};
+							});
+						});
+						$.each(result.click, function (index, tips) {
+							$(tips.selector).click(function () {
+								if (hitFlag) {
+									return false
+								}
+								hitFlag = true;
+								setTimeout(function () {
+									hitFlag = false;
+								}, 8000);
+								var text = tips.text;
+								if (Array.isArray(tips.text)) text = tips.text[Math.floor(Math.random() * tips.text.length + 1) - 1];
+								text = text.renderTip({ text: $(this).text() });
+								showMessage(text, 3000);
+							});
+							clearInterval(liveTlakTimer);
+							liveTlakTimer = null;
+							if (liveTlakTimer == null) {
+								liveTlakTimer = window.setInterval(function () {
+									showHitokoto();
+								}, 15000);
+							};
+						});
+					}
+				});
+			}
+			initTips();
+
+			var text;
+			if (document.referrer !== '') {
+				var referrer = document.createElement('a');
+				referrer.href = document.referrer;
+				text = '嗨！来自 <span style="color:#0099cc;">' + referrer.hostname + '</span> 的朋友！';
+				var domain = referrer.hostname.split('.')[1];
+				if (domain == 'baidu') {
+					text = '嗨！ 来自 百度搜索 的朋友！<br>欢迎访问<span style="color:#0099cc;">「 ' + document.title.split(' - ')[0] + ' 」</span>';
+				} else if (domain == 'so') {
+					text = '嗨！ 来自 360搜索 的朋友！<br>欢迎访问<span style="color:#0099cc;">「 ' + document.title.split(' - ')[0] + ' 」</span>';
+				} else if (domain == 'google') {
+					text = '嗨！ 来自 谷歌搜索 的朋友！<br>欢迎访问<span style="color:#0099cc;">「 ' + document.title.split(' - ')[0] + ' 」</span>';
+				}
+			} else {
+				if (window.location.href == home_Path) { //主页URL判断，需要斜杠结尾
+					var now = (new Date()).getHours();
+					if (now > 23 || now <= 5) {
+						text = '你是夜猫子呀？这么晚还不睡觉，明天起的来嘛？';
+					} else if (now > 5 && now <= 7) {
+						text = '早上好！一日之计在于晨，美好的一天就要开始了！';
+					} else if (now > 7 && now <= 11) {
+						text = '上午好！工作顺利嘛，不要久坐，多起来走动走动哦！';
+					} else if (now > 11 && now <= 14) {
+						text = '中午了，工作了一个上午，现在是午餐时间！';
+					} else if (now > 14 && now <= 17) {
+						text = '午后很容易犯困呢，今天的运动目标完成了吗？';
+					} else if (now > 17 && now <= 19) {
+						text = '傍晚了！窗外夕阳的景色很美丽呢，最美不过夕阳红~~';
+					} else if (now > 19 && now <= 21) {
+						text = '晚上好，今天过得怎么样？';
+					} else if (now > 21 && now <= 23) {
+						text = '已经这么晚了呀，早点休息吧，晚安~~';
+					} else {
+						text = '嗨~ 快来逗我玩吧！';
+					}
+				} else {
+					text = '欢迎阅读<span style="color:#0099cc;">「 ' + document.title.split(' - ')[0] + ' 」</span>';
+				}
+			}
+			showMessage(text, 12000);
+		})();
+
+		liveTlakTimer = setInterval(function () {
+			showHitokoto();
+		}, 15000);
+
+		function showHitokoto() {
+			if (sessionStorage.getItem("Sleepy") !== "1") {
+				if (!AITalkFlag) {
+					$.getJSON('https://v1.hitokoto.cn/', function (result) {
+						talkValTimer();
+						showMessage(result.hitokoto, 0);
+					});
+				}
+			} else {
+				hideMessage(0);
+				if (sleepTimer_ == null) {
+					sleepTimer_ = setInterval(function () {
+						checkSleep();
+					}, 200);
+				}
+			}
+		}
+
+		function checkSleep() {
+			var sleepStatu = sessionStorage.getItem("Sleepy");
+			if (sleepStatu !== '1') {
+				talkValTimer();
+				showMessage('你回来啦~', 0);
+				clearInterval(sleepTimer_);
+				sleepTimer_ = null;
+			}
+		}
+
+		function showMessage(text, timeout) {
+			if (Array.isArray(text)) text = text[Math.floor(Math.random() * text.length + 1) - 1];
+			$('.message').stop();
+			$('.message').html(text);
+			$('.message').fadeTo(200, 1);
+			//if (timeout === null) timeout = 5000;
+			//hideMessage(timeout);
+		}
+		function talkValTimer() {
+			$('#live_talk').val('1');
+		}
+
+		function hideMessage(timeout) {
+			//$('.message').stop().css('opacity',1);
+			if (timeout === null) timeout = 5000;
+			$('.message').delay(timeout).fadeTo(200, 0);
+		}
+
+		function initLive2d() {
+			$('#hideButton').on('click', function () {
+				if (AIFadeFlag) {
+					return false;
+				} else {
+					AIFadeFlag = true;
+					localStorage.setItem("live2dhidden", "0");
+					$('#landlord').fadeOut(200);
+					$('#open_live2d').delay(200).fadeIn(200);
+					setTimeout(function () {
+						AIFadeFlag = false;
+					}, 300);
+				}
+			});
+			$('#open_live2d').on('click', function () {
+				if (AIFadeFlag) {
+					return false;
+				} else {
+					AIFadeFlag = true;
+					localStorage.setItem("live2dhidden", "1");
+					$('#open_live2d').fadeOut(200);
+					$('#landlord').delay(200).fadeIn(200);
+					setTimeout(function () {
+						AIFadeFlag = false;
+					}, 300);
+				}
+			});
+			$('#youduButton').on('click', function () {
+				if ($('#youduButton').hasClass('doudong')) {
+					var typeIs = $('#youduButton').attr('data-type');
+					$('#youduButton').removeClass('doudong');
+					$('body').removeClass(typeIs);
+					$('#youduButton').attr('data-type', '');
+				} else {
+					var duType = $('#duType').val();
+					var duArr = duType.split(",");
+					var dataType = duArr[Math.floor(Math.random() * duArr.length)];
+
+					$('#youduButton').addClass('doudong');
+					$('#youduButton').attr('data-type', dataType);
+					$('body').addClass(dataType);
+				}
+			});
+			if (apiKey) {
+				$('#showInfoBtn').on('click', function () {
+					var live_statu = $('#live_statu_val').val();
+					if (live_statu == "0") {
+						return
+					} else {
+						$('#live_statu_val').val("0");
+						$('.live_talk_input_body').fadeOut(500);
+						AITalkFlag = false;
+						showHitokoto();
+						$('#showTalkBtn').show();
+						$('#showInfoBtn').hide();
+					}
+				});
+				$('#showTalkBtn').on('click', function () {
+					var live_statu = $('#live_statu_val').val();
+					if (live_statu == "1") {
+						return
+					} else {
+						$('#live_statu_val').val("1");
+						$('.live_talk_input_body').fadeIn(500);
+						AITalkFlag = true;
+						$('#showTalkBtn').hide();
+						$('#showInfoBtn').show();
+
+					}
+				});
+				$('#talk_send').on('click', function () {
+					var info_ = $('#AIuserText').val();
+					var userid_ = $('#AIuserName').val();
+					if (info_ == "") {
+						showMessage('写点什么吧！', 0);
+						return;
+					}
+					if (userid_ == "") {
+						showMessage('聊之前请告诉我你的名字吧！', 0);
+						return;
+					}
+					showMessage('思考中~', 0);
+					let protocol = window.location.protocol.indexOf("s") > 0 ? "https" : "http";
+					$.ajax({
+						type: "get",
+						url: `${protocol}://www.tuling123.com/openapi/api?key=${apiKey}&info=${info_}`,
+						dataType: "json",
+						success: function (res) {
+							talkValTimer();
+							showMessage(res.text, 0);
+							$('#AIuserText').val("");
+							sessionStorage.setItem("live2duser", userid_);
+						},
+						error: function (e) {
+							talkValTimer();
+							showMessage('似乎有什么错误，请和站长联系！', 0);
+						}
+					});
+				});
+			} else {
+				$('#showInfoBtn').hide();
+				$('#showTalkBtn').hide();
+			}
+			//获取音乐信息初始化
+			var bgmListInfo = $('input[name=live2dBGM]');
+			if (bgmListInfo.length == 0) {
+				$('#musicButton').hide();
+			} else {
+				var bgmPlayNow = parseInt($('#live2d_bgm').attr('data-bgm'));
+				var bgmPlayTime = 0;
+				var live2dBGM_Num = sessionStorage.getItem("live2dBGM_Num");
+				var live2dBGM_PlayTime = sessionStorage.getItem("live2dBGM_PlayTime");
+				if (live2dBGM_Num) {
+					if (live2dBGM_Num <= $('input[name=live2dBGM]').length - 1) {
+						bgmPlayNow = parseInt(live2dBGM_Num);
+					}
+				}
+				if (live2dBGM_PlayTime) {
+					bgmPlayTime = parseInt(live2dBGM_PlayTime);
+				}
+				var live2dBGMSrc = bgmListInfo.eq(bgmPlayNow).val();
+				$('#live2d_bgm').attr('data-bgm', bgmPlayNow);
+				$('#live2d_bgm').attr('src', live2dBGMSrc);
+				$('#live2d_bgm')[0].currentTime = bgmPlayTime;
+				$('#live2d_bgm')[0].volume = 0.5;
+				var live2dBGM_IsPlay = sessionStorage.getItem("live2dBGM_IsPlay");
+				var live2dBGM_WindowClose = sessionStorage.getItem("live2dBGM_WindowClose");
+				if (live2dBGM_IsPlay == '0' && live2dBGM_WindowClose == '0') {
+					$('#live2d_bgm')[0].play();
+					$('#musicButton').addClass('play');
+				}
+				sessionStorage.setItem("live2dBGM_WindowClose", '1');
+				$('#musicButton').on('click', function () {
+					if ($('#musicButton').hasClass('play')) {
+						$('#live2d_bgm')[0].pause();
+						$('#musicButton').removeClass('play');
+						sessionStorage.setItem("live2dBGM_IsPlay", '1');
+					} else {
+						$('#live2d_bgm')[0].play();
+						$('#musicButton').addClass('play');
+						sessionStorage.setItem("live2dBGM_IsPlay", '0');
+					}
+				});
+				window.onbeforeunload = function () {
+					sessionStorage.setItem("live2dBGM_WindowClose", '0');
+					if ($('#musicButton').hasClass('play')) {
+						sessionStorage.setItem("live2dBGM_IsPlay", '0');
+					}
+				}
+				document.getElementById('live2d_bgm').addEventListener("timeupdate", function () {
+					var live2dBgmPlayTimeNow = document.getElementById('live2d_bgm').currentTime;
+					sessionStorage.setItem("live2dBGM_PlayTime", live2dBgmPlayTimeNow);
+				});
+				document.getElementById('live2d_bgm').addEventListener("ended", function () {
+					var listNow = parseInt($('#live2d_bgm').attr('data-bgm'));
+					listNow++;
+					if (listNow > $('input[name=live2dBGM]').length - 1) {
+						listNow = 0;
+					}
+					var listNewSrc = $('input[name=live2dBGM]').eq(listNow).val();
+					sessionStorage.setItem("live2dBGM_Num", listNow);
+					$('#live2d_bgm').attr('src', listNewSrc);
+					$('#live2d_bgm')[0].play();
+					$('#live2d_bgm').attr('data-bgm', listNow);
+				});
+				document.getElementById('live2d_bgm').addEventListener("error", function () {
+					$('#live2d_bgm')[0].pause();
+					$('#musicButton').removeClass('play');
+					showMessage('音乐似乎加载不出来了呢！', 0);
+				});
+			}
+			//获取用户名
+			var live2dUser = sessionStorage.getItem("live2duser");
+			if (live2dUser !== null) {
+				$('#AIuserName').val(live2dUser);
+			}
+			//获取位置
+			var landL = sessionStorage.getItem("historywidth");
+			var landB = sessionStorage.getItem("historyheight");
+			if (landL == null || landB == null) {
+				landL = '5px'
+				landB = '0px'
+			}
+			$('#landlord').css('left', landL + 'px');
+			$('#landlord').css('bottom', landB + 'px');
+			//移动
+			function getEvent() {
+				return window.event || arguments.callee.caller.arguments[0];
+			}
+			var smcc = document.getElementById("landlord");
+			var moveX = 0;
+			var moveY = 0;
+			var moveBottom = 0;
+			var moveLeft = 0;
+			var moveable = false;
+			var docMouseMoveEvent = document.onmousemove;
+			var docMouseUpEvent = document.onmouseup;
+			smcc.onmousedown = function () {
+				var ent = getEvent();
+				moveable = true;
+				moveX = ent.clientX;
+				moveY = ent.clientY;
+				var obj = smcc;
+				moveBottom = parseInt(obj.style.bottom);
+				moveLeft = parseInt(obj.style.left);
+				if (isFirefox = navigator.userAgent.indexOf("Firefox") > 0) {
+					window.getSelection().removeAllRanges();
+				}
+				document.onmousemove = function () {
+					if (moveable) {
+						var ent = getEvent();
+						var x = moveLeft + ent.clientX - moveX;
+						var y = moveBottom + (moveY - ent.clientY);
+						obj.style.left = x + "px";
+						obj.style.bottom = y + "px";
+					}
+				};
+				document.onmouseup = function () {
+					if (moveable) {
+						var historywidth = obj.style.left;
+						var historyheight = obj.style.bottom;
+						historywidth = historywidth.replace('px', '');
+						historyheight = historyheight.replace('px', '');
+						sessionStorage.setItem("historywidth", historywidth);
+						sessionStorage.setItem("historyheight", historyheight);
+						document.onmousemove = docMouseMoveEvent;
+						document.onmouseup = docMouseUpEvent;
+						moveable = false;
+						moveX = 0;
+						moveY = 0;
+						moveBottom = 0;
+						moveLeft = 0;
+					}
+				};
+			};
+		}
+		$(document).ready(function () {
+			var AIimgSrc = [];
+			let chooseLive2d = 'aoba'
+			if (chooseLive2d === 'histoire') {
+				AIimgSrc.push(message_Path + "model/histoire/histoire.1024/texture_00.png");
+				AIimgSrc.push(message_Path + "model/histoire/histoire.1024/texture_01.png");
+				AIimgSrc.push(message_Path + "model/histoire/histoire.1024/texture_02.png");
+				AIimgSrc.push(message_Path + "model/histoire/histoire.1024/texture_03.png");
+			} else if (chooseLive2d === 'rem') {
+				AIimgSrc.push(message_Path + "model/rem/remu2048/texture_00.png");
+			} else if (chooseLive2d === 'aoba') {
+				AIimgSrc.push(message_Path + "model/aoba/textures/texture_00.png");
+			} else if (chooseLive2d === 'hijiki') {
+				AIimgSrc.push(message_Path + "model/hijiki/moc/hijiki.2048/texture_00.png");
+			} else if (chooseLive2d === 'tororo') {
+				AIimgSrc.push(message_Path + "model/tororo/moc/tororo.2048/texture_00.png");
+			}
+			var images = [];
+			var imgLength = AIimgSrc.length;
+			var loadingNum = 0;
+			for (var i = 0; i < imgLength; i++) {
+				images[i] = new Image();
+				images[i].src = AIimgSrc[i];
+				images[i].onload = function () {
+					loadingNum++;
+					if (loadingNum === imgLength) {
+						var live2dhidden = localStorage.getItem("live2dhidden");
+						if (live2dhidden === "0") {
+							setTimeout(function () {
+								$('#open_live2d').fadeIn(200);
+							}, 1300);
+						} else {
+							setTimeout(function () {
+								$('#landlord').fadeIn(200);
+							}, 1300);
+						}
+						let model = '';
+						if (chooseLive2d === 'histoire') {
+							model = message_Path + "model/histoire/model.json";
+						} else if (chooseLive2d === 'rem') {
+							model = message_Path + "model/rem/model.json";
+						} else if (chooseLive2d === 'aoba') {
+							model = message_Path + "model/aoba/model.json";
+						} else if (chooseLive2d === 'hijiki') {
+							model = message_Path + "model/hijiki/hijiki.model.json";
+						} else if (chooseLive2d === 'tororo') {
+							model = message_Path + "model/tororo/tororo.model.json";
+						}
+						setTimeout(function () {
+							loadlive2d("live2d", model);
+						}, 1000);
+						initLive2d();
+						images = null;
+					}
+				}
+			}
+		});
+	}
+</script>
+                      
+                        
+</div>
+<script>
+  let sideBarOpen = "sidebar-open";
+  let body = document.body;
+  let back2Top = document.querySelector("#back_to_top"),
+    back2TopText = document.querySelector("#back_to_top_text"),
+    drawerBox = document.querySelector("#drawer_box"),
+    rightSideBar = document.querySelector(".sidebar"),
+    viewport = document.querySelector("body");
+
+  function scrollAnimation(currentY, targetY) {
+    let needScrollTop = targetY - currentY;
+    let _currentY = currentY;
+    setTimeout(() => {
+      const dist = Math.ceil(needScrollTop / 10);
+      _currentY += dist;
+      window.scrollTo(_currentY, currentY);
+      if (needScrollTop > 10 || needScrollTop < -10) {
+        scrollAnimation(_currentY, targetY);
+      } else {
+        window.scrollTo(_currentY, targetY);
+      }
+    }, 1);
+  }
+
+  back2Top.addEventListener("click", function (e) {
+    scrollAnimation(document.scrollingElement.scrollTop, 0);
+    e.stopPropagation();
+    return false;
+  });
+
+  window.addEventListener("scroll", function (e) {
+    let percent =
+      (document.scrollingElement.scrollTop /
+        (document.scrollingElement.scrollHeight -
+          document.scrollingElement.clientHeight)) *
+      100;
+    if (percent > 1 && !back2Top.classList.contains("back-top-active")) {
+      back2Top.classList.add("back-top-active");
+    }
+    if (percent == 0) {
+      back2Top.classList.remove("back-top-active");
+    }
+    if (back2TopText) {
+      back2TopText.textContent = Math.floor(percent);
+    }
+  });
+
+  let hasCacu = false;
+  window.addEventListener("resize", function (e) {
+    calcuHeight();
+  });
+
+  function calcuHeight() {
+    // 动态调整站点概览高度
+    if (
+      (!hasCacu && back2Top.classList.contains("pisces")) ||
+      back2Top.classList.contains("gemini")
+    ) {
+      let sideBar = document.querySelector(".sidebar");
+      let navUl = document.querySelector("#site_nav");
+      sideBar.style =
+        "margin-top:" + (navUl.offsetHeight + navUl.offsetTop + 15) + "px;";
+      hasCacu = true;
+    }
+  }
+  calcuHeight();
+
+  let open = false,
+    MOTION_TIME = 300,
+    RIGHT_MOVE_DIS = "320px";
+
+  if (drawerBox) {
+    let rightMotions = document.querySelectorAll(".right-motion");
+    let right = drawerBox.classList.contains("right");
+
+    let transitionDir = right
+      ? "transition.slideRightIn"
+      : "transition.slideLeftIn";
+
+    let openProp, closeProp;
+    if (right) {
+      openProp = {
+        paddingRight: RIGHT_MOVE_DIS,
+      };
+      closeProp = {
+        paddingRight: "0px",
+      };
+    } else {
+      openProp = {
+        paddingLeft: RIGHT_MOVE_DIS,
+      };
+      closeProp = {
+        paddingLeft: "0px",
+      };
+    }
+
+    drawerBox.onclick = function () {
+      open = !open;
+      jQuery.Velocity(rightSideBar, "stop");
+      jQuery.Velocity(viewport, "stop");
+      jQuery.Velocity(rightMotions, "stop");
+      if (open) {
+        jQuery.Velocity(
+          rightSideBar,
+          {
+            width: RIGHT_MOVE_DIS,
+          },
+          {
+            duration: MOTION_TIME,
+            begin: function () {
+              jQuery.Velocity(rightMotions, transitionDir, {});
+            },
+          }
+        );
+        jQuery.Velocity(viewport, openProp, {
+          duration: MOTION_TIME,
+        });
+      } else {
+        jQuery.Velocity(
+          rightSideBar,
+          {
+            width: "0px",
+          },
+          {
+            duration: MOTION_TIME,
+            begin: function () {
+              jQuery.Velocity(rightMotions, {
+                opacity: 0,
+              });
+            },
+          }
+        );
+        jQuery.Velocity(viewport, closeProp, {
+          duration: MOTION_TIME,
+        });
+      }
+      for (let i = 0; i < drawerBox.children.length; i++) {
+        drawerBox.children[i].classList.toggle("muse-line");
+      }
+      drawerBox.classList.toggle(sideBarOpen);
+    };
+  }
+
+  // 链接跳转
+  let newWindow = "false";
+  if (newWindow === "true") {
+    let links = document.querySelectorAll(".post-body a");
+    links.forEach((item) => {
+      if (!item.classList.contains("btn")) {
+        item.setAttribute("target", "_blank");
+      }
+    });
+  }
+
+  let faSearch = document.querySelector("#fa_search");
+  faSearch &&
+    faSearch.addEventListener("click", function () {
+      document.querySelector("#search_mask").style = "";
+    });
+
+  // 代码高亮
+  hljs.initHighlightingOnLoad();
+
+  // 离开当前页title变化
+  var leaveTitle = "ヾ(￣▽￣)我在这呢";
+  var normal_title = document.title;
+  if (leaveTitle) {
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState == "hidden") {
+        normal_title = document.title;
+        document.title = leaveTitle;
+      } else {
+        document.title = normal_title;
+      }
+    });
+  }
+</script>
+
+<link rel="stylesheet" href="/media/css/jquery.fancybox.css" />
+<script src="/media/js/jquery.fancybox.js"></script>
+
+<script>
+  let images = document.querySelectorAll(".section img");
+  images.forEach((image) => {
+    var parent = image.parentElement;
+    var next = image.nextElementSibling;
+    parent.removeChild(image);
+    var aelem = document.createElement("a");
+    aelem.href = image.src;
+    aelem.dataset["fancybox"] = "images";
+    aelem.dataset["rel"] = "fancybox-button";
+    aelem.classList.add("fancybox");
+    aelem.appendChild(image);
+    parent.insertBefore(aelem, next);
+  });
+</script>
+    <div class="reward-mask" style="display: none;">
+  <div class="reward-relative">
+    <span class="close" aria-hidden="true">x</span>
+    <div class="reward-body">
+      <h2>感谢您的支持，我会继续努力的!</h2>
+      <div class="reward-img-box">
+        <div style="position: relative; width: 140px; height: 140px;">
+          
+          
+          
+        </div>
+      </div>
+      <p class="reward-word">扫码打赏，你说多少就多少</p>
+      <p class="reward-tip"> </p>
+    </div>
+    <div class="bottom">
+      
+      
+    </div>
+  </div>
+</div>
+<style>
+  .reward-mask {
+    position: fixed;
+    z-index: 99999;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #00000054;
+  }
+
+  .reward-relative {
+    position: relative;
+    width: 480px;
+    text-align: center;
+    margin: 0 auto;
+    border-radius: 5px;
+    background-color: #fff;
+    top: 50%;
+    margin-top: -205px;
+  }
+
+  .reward-relative .close {
+    position: absolute;
+    right: 10px;
+    font-weight: normal;
+    font-size: 16px;
+    color: #929292;
+  }
+
+  .reward-body {
+    padding: 40px 20px 20px;
+  }
+
+  .bottom {
+    display: flex;
+  }
+
+  .reward-btn {
+    text-align: center;
+  }
+
+  .reward-btn-text {
+    display: inline-block;
+    cursor: pointer;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    border-radius: 50%;
+    background-color: #ff9734;
+    color: #FFF;
+    margin-top: 20px;
+  }
+
+  .pay-text {
+    margin-top: 10px;
+    padding: 10px;
+    flex: 1;
+    transition: all .2s linear;
+  }
+
+  .pay-text:hover {
+    background-color: #a5a5a536;
+  }
+
+  .reward-body h2 {
+    padding-top: 10px;
+    text-align: center;
+    color: #a3a3a3;
+    font-size: 16px;
+    font-weight: normal;
+    margin: 0 0 20px;
+  }
+
+  .reward-body h2:after,
+  .reward-body h2:before {
+    font-family: Arial, Helvetica, sans-serif;
+    background: 0 0;
+    width: 0;
+    height: 0;
+    font-style: normal;
+    color: #eee;
+    font-size: 80px;
+    position: absolute;
+    top: 20px;
+  }
+
+  .reward-body h2:before {
+    content: '\201c';
+    left: 50px;
+  }
+
+  .reward-body h2:after {
+    content: '\201d';
+    right: 80px;
+  }
+
+  .reward-img-box {
+    display: inline-block;
+    padding: 10px;
+    border: 6px solid #ea5f00;
+    margin: 0 auto;
+    border-radius: 3px;
+    position: relative;
+  }
+
+  .reward-img {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (max-width: 767px) {
+    .reward-relative {
+      height: 100%;
+      top: 0px;
+      margin-top: 0;
+      width: auto;
+    }
+
+    .reward-relative .bottom {
+      flex-direction: column;
+    }
+
+    .reward-relative .pay-text {
+      width: 80%;
+      margin: 5px auto;
+      border: 1px solid silver;
+      padding: 6px;
+      border-radius: 4px;
+    }
+
+    .reward-body h2:after {
+      right: 40px;
+    }
+
+    .reward-body h2:after,
+    .reward-body h2:before {
+      font-size: 60px;
+    }
+
+    .reward-body h2:before {
+      left: 20px;
+    }
+  }
+</style>
+<script>
+  !function () {
+    var mask = document.querySelector('.reward-mask');
+    let close = document.querySelector('.reward-relative .close');
+    let rewardBtn = document.querySelector('.reward-btn');
+
+    let zfb = document.querySelector('#zfb'),
+      wx = document.querySelector('#wx'),
+      zfbBtn = document.querySelector('#zfbBtn'),
+      wxBtn = document.querySelector('#wxBtn');
+
+    if (zfbBtn && wxBtn) {
+      zfbBtn.addEventListener('click', () => {
+        jQuery.Velocity(zfb, 'transition.slideLeftIn', {
+          duration: 400
+        });
+        jQuery.Velocity(wx, 'transition.slideRightOut', {
+          display: 'none',
+          duration: 400
+        });
+      });
+
+      wxBtn.addEventListener('click', () => {
+        jQuery.Velocity(wx, 'transition.slideRightIn', {
+          duration: 400
+        });
+        jQuery.Velocity(zfb, 'transition.slideLeftOut', {
+          display: 'none',
+          duration: 400
+        });
+      });
+    }
+
+    rewardBtn.addEventListener('click', (e) => {
+      jQuery.Velocity(mask, 'transition.slideDownIn', {
+        duration: 400
+      })
+    });
+
+    close.addEventListener('click', (e) => {
+      e.preventDefault();
+      jQuery.Velocity(mask, 'transition.slideUpOut', {
+        duration: 400
+      })
+    })
+  }()
+</script>
+
+  </div>
+</body>
+
+  <div class="search-mask" id="search_mask" style="display: none;">
+  <div class="search-box">
+    <div class="search-title">
+      <i class="fa fa-search"></i>
+      <div class="input-box">
+        <input id="search" type="text" class="language" data-lan="search" placeholder="搜索">
+      </div>
+      <i id="close" class="fa fa-times-circle"></i>
+    </div>
+    <div class="stat-box">
+      <span id="stat_count">0</span><span class="language" data-lan="stat">条相关条目，使用了</span><span id="stat_times">0</span><span class="language" data-lan="stat-time">毫秒</span>
+      <hr>
+    </div>
+    <div class="result" id="result">
+      
+      <div class="item">
+        <a class="result-title" style="opacity: 0;" href="https://song-gan.github.io/post/zhong-kao-you-ji-ti-yu-zhong-kao/"" data-c="
+          &lt;h2 id=&#34;font-size5-colorred記font体育中考满分&#34;&gt;&lt;font size=&#34;5&#34; color=&#34;red&#34;&gt;『記』&lt;/font&gt;体育中考满分&lt;/h2&gt;
+&lt;h3 id=&#34;2022年4月12日&#34;&gt;&lt;strong&gt;2022年4月12日&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;首先聊一聊为准备体考的那些儿事：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;亲爱的DC为了在短期内提升考生们的成绩，加大了每天大课间的锻炼量，三圈的400米，无尽的蛙跳与俯卧撑~~ 一个月内成功让我先后扭伤了腰，崴到了脚， 拉伤了筋，前前后后 &lt;em&gt;&lt;s&gt;划水&lt;/s&gt;&lt;/em&gt; 疗伤了一两周后，突然就可以跳到2米5了！&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在距离体育中考还有1天的时候，为了验证我的伤是不是好的差不多，于是中午借上厕所之余，在教学楼的走廊里练习了一下立定跳远，不成想，一跳就滑倒了，尾椎骨的惨叫~ 新伤+1&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;下午第二节课是高中数学课，本来可以上完一整节课，这是赵老师过来跟吴老师耳语了一番，于是让我们上自习， 20 分钟后拿出了语文字词单子订正答案。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;班上准备了红牛和巧克力，大家都在出发前把红牛喝了。结果下去就有挪威行为：“在喝红牛的那个瓜娃子放下！这东西你懂不懂你就在乱喝！这东西是你跑完中长跑累的着不住的时候喝补充体力的！“还好我的包里面还剩下了昨天买的一条士力架，虽然融化了，但是还是在1000米后拯救了我！&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;开始前，老师讲解了一些注意事项。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;不幸带伤参考，下午体考的时候还是大太阳，29℃，还好是超常发挥，这中考体育80分拿满了，最没想到的是，我跳远今天轻轻一跳，还以为跳不到满分2米5了，结果2米57，全力的话2米7都应该没问题，跑1000米的时候我以为我会卡线冲过终点，结果直接全程领跑，小组里面第一名，真的没想到，3分20秒（满分：3分48秒）！&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;开始前，老师讲解了一些注意事项。&lt;br&gt;
+不犯规，不吃亏。多观察，动脑筋。&lt;br&gt;
+不犯规， | &lt;font size=&#34;3&#34; color=&#34;white&#34;&gt; 考试的时候如果发现任何可以提分的技巧，请悄悄告诉你的同学。&lt;/font&gt;&lt;br&gt;
+不吃亏。 | &lt;font size=&#34;3&#34; color=&#34;white&#34;&gt; 比如说立定跳远可以跳出红外线检测区域，中长跑可以抄近道、抢跑……总之机器感应不到你的方法，记住，没有任何老师教你这些方法。&lt;/font&gt;&lt;br&gt;
+多观察， | &lt;font size=&#34;3&#34; color=&#34;white&#34;&gt; 我们不提倡，不建议，不反对，也不负责。&lt;/font&gt;&lt;br&gt;
+动脑筋。 | &lt;font size=&#34;3&#34; color=&#34;white&#34;&gt; 在考乒乓球的时候，监考老师会在你的手上写一个数字，如果这个数字小于 20 ，请先不要录入成绩，马上到篷子后面去找两个抽烟的老师。&lt;/font&gt;&lt;br&gt;
+唐松 &lt;font color=&#34;white&#34;&gt; &amp;amp; 罗巍&lt;/font&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+">【中考游记】体育中考</a>
+      </div>
+      
+      <div class="item">
+        <a class="result-title" style="opacity: 0;" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-idasuan-fa/"" data-c="
+          &lt;h2 id=&#34;ida算法&#34;&gt;IDA*算法&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;IDA&lt;em&gt;是对迭代加深搜索IDDFS的优化，我们可以把IDA&lt;/em&gt;看作A*算法思想在迭代加深搜索中的应用。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;IDDFS仍然是一种“盲目”的搜索方法，只是把搜索范围约束到了可行的空间内。如果在进行IDDFS的时候能预测当前DFS的状态，不在继续深入下去，那么我们就可以节约很大部分的时间，不在搜索这个分支，从而提高程序效率。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;同之前的A*的算法，这个预测就是在IDDFS中增加一个估价函数。在某个状态，经过函数计算，发现后续搜索无解，就返回。简单地说，就是在IDDFS的过程中利用估价函数进行剪枝操作，我们看一道例题：&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;例题破坏正方形&#34;&gt;&lt;a href=&#34;https://www.acwing.com/problem/content/184/&#34;&gt;【例题】破坏正方形&lt;/a&gt;&lt;/h2&gt;
+&lt;h3 id=&#34;题解&#34;&gt;题解&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;首先要处理出每个正方形的所有边编号&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;这也就是这题的难点，考虑如何描述一个正方形&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;我们可以用三个值描述一个正方形：&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;正方形边长和左上角横、纵坐标&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;那么我们接下来要做的就是对于每组 正方形边长和左上角横、纵坐标，找出它所有边的编号。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure data-type=&#34;image&#34; tabindex=&#34;1&#34;&gt;&lt;img src=&#34;https://www.imageoss.com/images/2022/03/05/5.1.8-1-1e9cd42086a942f81.png&#34; alt=&#34;&#34; loading=&#34;lazy&#34;&gt;&lt;/figure&gt;
+&lt;figure data-type=&#34;image&#34; tabindex=&#34;2&#34;&gt;&lt;img src=&#34;https://www.imageoss.com/images/2022/03/05/5.1.8-1-28c7e93276cf945a0.png&#34; alt=&#34;&#34; loading=&#34;lazy&#34;&gt;&lt;/figure&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;对于所有横着的火柴，我们将其坐标定义为其左端点坐标&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;对于所有竖着的火柴，我们将其坐标定义为其上端点坐标&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;举个例子，编号为15和18的火柴的坐标都是(2,0)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;先考虑横着的火柴。对于坐标为(r,c)的火柴，其编号即为 坐标为 (r, 0) 的火柴的编号+c。而所有坐标为(r,0)的火柴的编号，正好构成一个 首项为1，公差为2n+1 的等差数列，其中 n 为网格边长。那么坐标为(r,0)的火柴，编号为1+r(2n+1)。所以坐标为(r,c)的火柴，编号为1+r(2n+1)+c。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;再考虑竖着的火柴。对于所有坐标为(r,c)的火柴，其编号为 与其坐标相同的横着的火柴的编号+n所以坐标为(r,c)的火柴，编号为1+r(2n+1)+c+n&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;然后考虑每个正方形所包含的所有火柴的横纵坐标。对于一个左上角坐标为(r,c)，边长为len的正方形，不难发现其四个顶点的坐标分别为(r,c)，(r+len,c)，(r,c+len)，(r+len,c+len)。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;考虑横着的火柴（以下i都从0开始），对于上边从左往右第 i个火柴，其坐标为(r,c+i)，所以其编号为 1+r(2n+1)+c+i。对于下边从左往右第 i个火柴，其坐标为(r+len,c+i)，所以其编号为 1+(r+len)(2n+1)+c+i。考虑竖着的火柴，对于左边从上往下第 i个火柴，其坐标为(r+i,c)，所以其编号为 1+(r+i)(2n+1)+c+n。对于右边从上往下第i个火柴，其坐标为(r+i,c+len)，所以其编号为 1+(r+i)(2n+1)+c+len+n。所以我们只需要从0到 len 枚举i，然后加边即可。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;然后问题变成最少选出多少边，使得每个正方形中至少被选出一条边。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;这是一个经典的重复覆盖问题，可以用 Dancing Links 求解。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;这里我们不适用DLX这个数据结构，直接求解。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;估计函数&#34;&gt;估计函数：&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;枚举所有未被删掉的正方形，将其所有边全部删掉，只记删除一条边。这样估计出的值一定不大于真实值，满足IDA*对估价函数的要求。其实这也是Dancing Links求解重复覆盖问题时的估价函数。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;搜索顺序优化&#34;&gt;搜索顺序优化：&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;找出最小的未被删除的正方形，依次枚举删除每条边。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;时间复杂度&#34;&gt;时间复杂度&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;搜索空间是指数级别的，但由于启发函数和剪枝的存在，实际搜索到的状态较少。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;//DC Songxingan
+#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;cmath&amp;gt;
+#include &amp;lt;cstdio&amp;gt;
+#include &amp;lt;cstdlib&amp;gt;
+#include &amp;lt;cstring&amp;gt;
+#include &amp;lt;algorithm&amp;gt;
+#include &amp;lt;queue&amp;gt;
+#include &amp;lt;vector&amp;gt;
+using namespace std;
+
+const int N = 61; // 网格最大是 5 * 5 的，其中最多会有 5 * (5 + 1) * 2 = 60 个正方形，所以要开到 61
+
+int n, idx;            // n 为网格规模，idx 为正方形数量
+int max_depth;         // IDA* 的 max_depth
+vector&amp;lt;int&amp;gt; square[N]; // 存每个正方形边上的火柴的编号
+bool used[N];          // 存每个火柴是否已经被破坏
+
+// 新加一个左上角坐标为 (r, c)，边长为 len 的正方形
+void add(int r, int c, int len)
+{
+    int d = n &amp;lt;&amp;lt; 1 | 1;
+ 	// 由于用到的 2n + 1 比较多，这里先用一个变量代替掉 2n + 1
+    vector&amp;lt;int&amp;gt; &amp;amp;s = square[idx];
+    s.clear(); // 有多组测试数据，需要上一组数据的内容清空
+    for (int i = 0; i &amp;lt; len; i++)
+    {
+        s.push_back(1 + r * d + c + i);               // 上边第 i 个
+        s.push_back(1 + (r + len) * d + c + i);       // 下边第 i 个
+        s.push_back(1 + n + r * d + c + i * d);       // 左边第 i 个
+        s.push_back(1 + n + r * d + c + i * d + len); // 右边第 i 个
+    }
+    idx++;
+}
+
+// 判断正方形 s 是否完整
+bool check(vector&amp;lt;int&amp;gt; &amp;amp;s)
+{
+    for (int i = 0; i &amp;lt; s.size(); i++)
+        if (used[s[i]])
+            return false; // 如果其中有一条边已经被破坏了，那么说明不完整
+    return true;          // 如果每条边都没被破坏，说明完整
+}
+
+// 估价函数
+int f()
+{
+    static bool backup[N];             
+// 由于要改动 used，需要先新建一个备份数组
+    memcpy(backup, used, sizeof used); // 将 used 复制到备份数组中
+    int res = 0;
+    for (int i = 0; i &amp;lt; idx; i++) // 枚举所有正方形
+        if (check(square[i]))     // 如果某个正方形是完整的，
+        {
+            res++; // 那么 res ++ ，并将该正方形所有的边都删去
+            for (int j = 0; j &amp;lt; square[i].size(); j++)
+                used[square[i][j]] = true;
+        }
+    memcpy(used, backup, sizeof used); // 复制回来
+    return res;
+}
+
+// IDA*
+bool dfs(int depth)
+{
+    if (depth + f() &amp;gt; max_depth)
+        return false;
+    for (int i = 0; i &amp;lt; idx; i++) // 枚举所有的正方形
+        if (check(square[i]))     // 如果第 i 个正方形还没被破坏
+        {
+            // 那么枚举该正方形的所有边编号，去掉该边并继续爆搜
+            for (int j = 0; j &amp;lt; square[i].size(); j++)
+            {
+                used[square[i][j]] = true;
+                if (dfs(depth + 1))
+                    return true;
+                used[square[i][j]] = false;
+            }
+            // 如果每条边都爆搜不成功，那么说明删掉 max_depth 个火柴无法破坏该正方形
+            return false;
+        }
+    return true; // 如果所有的正方形都被破坏了，返回 true
+}
+
+int main()
+{
+    int T;
+    scanf(&amp;quot;%d&amp;quot;, &amp;amp;T);
+    while (T--)
+    {
+        scanf(&amp;quot;%d&amp;quot;, &amp;amp;n), idx = 0;          // 初始化 idx
+        memset(used, false, sizeof used);  // 初始化 used
+        for (int len = 1; len &amp;lt;= n; len++) 
+// 枚举 len, r, c，预处理每个正方形
+            for (int r = 0; r + len &amp;lt;= n; r++)
+                for (int c = 0; c + len &amp;lt;= n; c++)
+                    add(r, c, len);
+        int k;
+        scanf(&amp;quot;%d&amp;quot;, &amp;amp;k);
+        while (k--) // 读入所有已经被破坏的边
+        {
+            int x;
+            scanf(&amp;quot;%d&amp;quot;, &amp;amp;x);
+            used[x] = true;
+        }
+        max_depth = 0; // IDA*
+        while (!dfs(0))
+            max_depth++;
+        printf(&amp;quot;%d\n&amp;quot;, max_depth);
+    }
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+">【OI学习笔记】IDA*算法</a>
+      </div>
+      
+      <div class="item">
+        <a class="result-title" style="opacity: 0;" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-die-dai-jia-shen-sou-suo/"" data-c="
+          &lt;h2 id=&#34;迭代加深搜索&#34;&gt;迭代加深搜索&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;在我们切了很多搜索题后，相信大家会发现有些问题，它们的搜索树很特别，不仅很深并且很宽。此时，如果我们采用一般的DFS会陷入递归而无法返回，如果我们采用一般的BFS，队列可能会炸掉。对于这些问题，它的答案可能在某个较浅的节点上，但如果一开始就选错了分支，那么就很可能在不包含答案的深层子树上浪费许多时间。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;迭代加深搜索通俗讲可以理解为“DFS + BFS”，具体操作方法如下：&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;我们先设定搜索深度为1，用DFS搜索到第1层即停止。也就是说，用DFS搜索一个深度为1 的搜索树。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果没有找到答案，再将搜索深度增加2，用DFS搜索前2层即停止。也就是说，用DFS搜索一个深度为2的搜索树。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;同理，我们每次增加搜索的深度，直到搜索到答案。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;这整个迭代的过程，再每一层的广度上采用的是BFS的思想，但是在实现搜索的过程中采用的是DFS，只是控制了DFS搜索根节点的每个子树的深度。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;那么就会有同学想说，假设搜索限制为d，每次需要重复跑1~d-1层上的节点，不是更耗费时间吗？但是我们知道当搜索树的节点分支很多时，层上的节点会以指数级增长，那么对于我们重复搜索的点就不值一提了。并且在搜索过程中我们采用记忆化搜索也可以很有效 地避免这个问题。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;总而言之，当搜索树规模随着层次的深入增长很快，并且我们能够确保答案在一个较浅 的节点时，就可以采用迭代加深的深度优先搜素算法解决问题。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;例题巴士&#34;&gt;&lt;a href=&#34;https://www.acwing.com/problem/content/188/&#34;&gt;【例题】巴士&lt;/a&gt;&lt;/h2&gt;
+&lt;h3 id=&#34;题解&#34;&gt;题解&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;//DC Songxingan
+#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;cmath&amp;gt;
+#include &amp;lt;cstdio&amp;gt;
+#include &amp;lt;cstdlib&amp;gt;
+#include &amp;lt;cstring&amp;gt;
+#include &amp;lt;algorithm&amp;gt;
+#include &amp;lt;queue&amp;gt;
+#define PII pair&amp;lt;int, int&amp;gt;
+using namespace std;
+const int N = 2000, M = 60;
+int n, bus[M];
+vector&amp;lt;pair&amp;lt;int, PII&amp;gt;&amp;gt; routes;
+
+bool is_route(int a, int d)
+{
+    for (int i = a; i &amp;lt; 60; i += d)
+        if (!bus[i])
+            return false;
+    return true;
+}
+
+bool DFS(int depth, int u, int sum, int start)
+{
+    if (u == depth)
+        return sum == n;
+    if (routes[start].first * (depth - u) + sum &amp;lt; n)
+        return false;
+    for (int i = start; i &amp;lt; routes.size(); i++)
+    {
+        auto r = routes[i];
+        int a = r.second.first, d = r.second.second;
+        if (!is_route(a, d))
+            continue;
+        for (int j = a; j &amp;lt; 60; j += d)
+            bus[j]--;
+        if (DFS(depth, u + 1, sum + r.first, i))
+            return true;
+        for (int j = a; j &amp;lt; 60; j += d)
+            bus[j]++;
+    }
+    return false;
+}
+
+int main()
+{
+    scanf(&amp;quot;%d&amp;quot;, &amp;amp;n);
+    for (int i = 0; i &amp;lt; n; i++)
+    {
+        int t;
+        scanf(&amp;quot;%d&amp;quot;, &amp;amp;t);
+        bus[t]++;
+    }
+
+    for (int i = 0; i &amp;lt; 60; i++)
+        for (int j = i + 1; i + j &amp;lt; 60; j++)
+            if (is_route(i, j))
+                routes.push_back({(59 - i) / j + 1, {i, j}});
+
+    sort(routes.begin(), routes.end(), greater&amp;lt;pair&amp;lt;int, PII&amp;gt;&amp;gt;());
+
+    int depth = 0;
+    while (!DFS(depth, 0, 0, 0))
+        depth++;
+
+    printf(&amp;quot;%d\n&amp;quot;, depth);
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+">【OI学习笔记】迭代加深搜索</a>
+      </div>
+      
+      <div class="item">
+        <a class="result-title" style="opacity: 0;" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-asuan-fa/"" data-c="
+          &lt;h2 id=&#34;a算法&#34;&gt;A*算法&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;我们知道BFS是一种“盲目”的搜索技术，它在搜索过程中并不会理会目标在哪里，只顾自己走，当然最后总会到达终点，但是时间空间复杂度就很难说了。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;比如说举个例子：你要从家到学校，现在有很多的路可以选择，对于聪明的你来说当然可以准确地选择最短的路，因为你毕竟不是个瞎子，能看见路途中你距离学校的距离，能够判断思考，可以随时调整新的路径。但是，对程序来说它很呆板，对于一般的BFS它会扩展各个方向尝试去搜索，哪怕是与目标背道而行，越走越远，所以我们为了让程序不去做这些不必要的搜索，可以考虑将我们的“智慧”交给程序，知道应该朝目标方向去搜索，那么这就是“启发式搜索”。这一节我们将学习其中比较简单的一种A*算法。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;通俗说，A*算法其实就是“BFS + 贪心”。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在具体探讨A*算法前，我们先回顾一下上一节的优先队列BFS算法。该算法维护了一个优先队列(二叉堆)，不断从堆中取出“当前代价最小”的状态(堆顶)进行扩展。每个状态被第一次从优先队中取出时，就得了从初始状态到该状态的最小代价。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;那么如果给定一个“目标状态”，需要求出从初始到目标状态的最小代价，那么优先队列BFS的这个“优先策略”是有局限性的。一个状态的当前代价最小，我们只能说从初始状态到该状态的代价最小，但在未来的搜索中我们不能保证这就是最优的，可能从该状态到目标状态会花费很大的代价。相反，一些状态在当前代价略大，但它能成为全局的最优解。优先队列BFS最终是可以求出全局的最优解，因为它的一个状态的最优解是在不断更新的。但是在搜索中它会优先选择前者的分支，这就会导致求出最优解的搜索量增大，在时间与空间的复杂度上增大许多。其实A*算法与这有点类似于“动态规划”与“贪心”的区别。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;再回到刚刚的例子，我们可以将从家到学校的路看最网格状的图，此时我们要曼哈顿距离的概念：曼哈顿距离——两点在横纵方向差的和，即d（i，j）=|xi-xj|+|yi-yj|。对于一个具备正南正北、正东正西方向规则布局的城镇街道，从一点到达另外一点的距离正是在南北方向上旅行的距离加上在东西方向上旅行的距离，所以，曼哈顿距离又称为出租车距离。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure data-type=&#34;image&#34; tabindex=&#34;1&#34;&gt;&lt;img src=&#34;https://www.imageoss.com/images/2022/03/03/1992968c31aa9a86b.png&#34; alt=&#34;曼哈顿距离&#34; loading=&#34;lazy&#34;&gt;&lt;/figure&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;为了我们搜索的效率，我们很自然可以想到，可以对未来可能产生的代价进行评估。那么我们就需要设计一个“估价函数”，它的功能主要是评估从当前任意状态到目标状态所需代价的估计值。在搜索中，仍要我们去维护一个堆，不断从堆中取出“当前代价+未来估价”最小的状态进行接下来的扩展搜索。为了摆正第一次从堆中取出目标状态是得到的就是最优解，我们设计的估价函数必须要满足一个基本准则：&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;设是当前所在的状态，是对的评估函数；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;那么满足：&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;表示从初始状态到达当前状态的实际代价，它不体现当前状态与目标的关系；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;表示从当前状态到目标的最优路径的评估，它实际就是“启发式”信息，我们把成为启发函数，很显然决定了A*算法的优劣。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;特别注意:不能漏掉最优解。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在之前从学校到家的例子中，我们需要用到的启发函数就是曼哈顿距离，这里为什么用曼哈顿距离作为启发函数请同学们自己思考。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;回头再看，我们说到A*算法通俗的说其实就是“BFS + 贪心”：&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;如果，有，这其实就是不同的BFS算法，会访问大量方块。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果，有，这其实就是贪心算法，这就会导致在扩展时，只注重与局部的最优解，达不到全局的最优解。更有可能陷入一个状态就出不来了。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;综上，A*算法提高搜索效率的关键，就在于能否设计出一个优秀的估价函数。在满足基本准则的前提下，还应该尽可能反映未来实际代价的变化趋势和相对大小关系，这样搜索才会较快地逼近最优解。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;例题第k短路&#34;&gt;&lt;a href=&#34;https://www.acwing.com/problem/content/180/&#34;&gt;【例题】第k短路&lt;/a&gt;&lt;/h2&gt;
+&lt;h3 id=&#34;题解&#34;&gt;题解&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;//DC Songxingan
+#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;cmath&amp;gt;
+#include &amp;lt;cstdio&amp;gt;
+#include &amp;lt;cstdlib&amp;gt;
+#include &amp;lt;cstring&amp;gt;
+#include &amp;lt;algorithm&amp;gt;
+#include &amp;lt;queue&amp;gt;
+#define PII pair&amp;lt;int, int&amp;gt;
+#define PIII pair&amp;lt;int, PII&amp;gt;
+#define x first
+#define y second
+using namespace std;
+
+const int N = 1010, M = 2e5 + 10;
+int n, m, S, T, K;
+int h[N], rh[N], e[M], w[M], ne[M], idx;
+int dist[N];
+bool st[N]; // 每个点用没用过
+
+void add(int h[], int a, int b, int c)
+{
+    e[idx] = b, w[idx] = c, ne[idx] = h[a], h[a] = idx++;
+}
+// 在反向图上dijkstra()，保存估价函数(dist[]距离)
+// dist存的是该点到终点的最小距离
+
+void dijkstra()
+{
+    priority_queue&amp;lt;PII, vector&amp;lt;PII&amp;gt;, greater&amp;lt;PII&amp;gt;&amp;gt; heap; // 优先队列，小根堆
+    heap.push({0, T});                                   //终点T是这里的起点 &amp;lt;距离，点编号&amp;gt;
+    memset(dist, 0x3f, sizeof dist);
+    dist[T] = 0;
+    while (heap.size())
+    {
+        auto t = heap.top();
+        heap.pop();
+        int ver = t.y;
+        if (st[ver])
+            continue;
+        st[ver] = true; // 遍历过
+        // 在反向图上遍历，rh[]数组
+        for (int i = rh[ver]; i != -1; i = ne[i])
+        {
+            int j = e[i];
+            if (dist[j] &amp;gt; dist[ver] + w[i])
+            {
+                dist[j] = dist[ver] + w[i];
+                heap.push({dist[j], j});
+            }
+        }
+    }
+}
+
+int astar()
+{
+    //
+    priority_queue&amp;lt;PIII, vector&amp;lt;PIII&amp;gt;, greater&amp;lt;PIII&amp;gt;&amp;gt; heap;
+    // A* 算法，从起点开始搜
+    heap.push({dist[S], {0, S}}); // 估价值，{真实值，编号}
+    int cnt = 0;                  // 终点遍历几次
+    // 无解的话，返回-1
+
+    if (dist[S] == 0x3f3f3f3f)
+        return -1;
+
+    while (heap.size())
+    {
+        auto t = heap.top();
+        heap.pop();
+        int ver = t.y.y, distance = t.y.x; //从起点到该点的真实距离
+        if (ver == T)
+            cnt++; // 遍历一遍终点， cnt++，直到第K次
+        // 这个点是终点，并且是第k短路，直接返回第k短路的真实距离distance
+        if (cnt == K)
+            return distance;
+
+        // 正向扩展所有的边
+        // 用 起点到该点的真实距离+ 该点到终点的估价距离来作为标准
+        // distance + w[i] + dist[j]
+        for (int i = h[ver]; i != -1; i = ne[i])
+        {
+            int j = e[i];
+            heap.push({distance + w[i] + dist[j], {distance + w[i], j}});
+        }
+    }
+
+    return -1;
+}
+
+int main()
+{
+    scanf(&amp;quot;%d%d&amp;quot;, &amp;amp;n, &amp;amp;m);
+    // 初始化表头
+    memset(h, -1, sizeof h);
+    memset(rh, -1, sizeof rh);
+    for (int i = 1; i &amp;lt;= m; i++)
+    {
+        int a, b, c;
+        scanf(&amp;quot;%d%d%d&amp;quot;, &amp;amp;a, &amp;amp;b, &amp;amp;c);
+        add(h, a, b, c);  // 建正边
+        add(rh, b, a, c); // 建反边
+    }
+    scanf(&amp;quot;%d%d%d&amp;quot;, &amp;amp;S, &amp;amp;T, &amp;amp;K);
+    if (S == T)
+        K++;
+
+    dijkstra();
+    printf(&amp;quot;%d\n&amp;quot;, astar());
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+">【OI学习笔记】A*算法</a>
+      </div>
+      
+      <div class="item">
+        <a class="result-title" style="opacity: 0;" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-shuang-xiang-bfs/"" data-c="
+          &lt;h2 id=&#34;双向bfs&#34;&gt;双向BFS&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;双向BFS我们可以看作是一般BFS的增强版。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;我们可以把BFS想象成在一个平静的池塘中丢一颗石头，激起的波浪一层层扩散到整个空间，知道到达边界或目标状态，类比搜索就是得到了从起点到目标点的最优解。那么，我们可不可以考虑丢两块石头下去呢，一个在起点，一个在终点，同时向对方扩散，那么两个的波一定会在某个位置相交，此时就是最优解。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;同理，我们进行BFS可以从起点和终点同时开始，相遇即最优解。双向BFS与一般BFS相比空间上会是少很多，从而更有效率。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;我们有两种搜索方法&#34;&gt;我们有两种搜索方法：&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;两个方向交替扩展。&lt;/li&gt;
+&lt;li&gt;选择节点个数较少的那个方向先扩展。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;相比较两种方法，方法2 为只需要略加修改控制结构，每次while循环时只扩展正反两个方向中结点数目较少的那一个，可以时两边的发展速度保持一定的平衡，从而减少总扩展结点的个数，加快搜索速度。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;所以，很明显 方法2 要优于 方法1。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;例题噩梦&#34;&gt;&lt;a href=&#34;https://www.acwing.com/problem/content/179/&#34;&gt;【例题】噩梦&lt;/a&gt;&lt;/h2&gt;
+&lt;h3 id=&#34;题解&#34;&gt;题解&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;由于是男孩和女孩同时移动，而不是只有一个人移动，所以这题要用双向广搜。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;我们在bfs中按时间t从 1开始枚举。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果男孩和女孩都不能再继续扩展，则跳出枚举。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;对于男孩，每次扩展三步，并标记扩展到的格子。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果某个能扩展的格子被女孩扩展过，那么直接返回现在的时间。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;对于女孩，每次扩展一步，并标记扩展到的格子。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果某个能扩展的格子被男孩扩展过，那么直接返回现在的时间。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;对于鬼，由于鬼是无视墙的，所以我们只需要在扩展男孩和女孩的时候，判断下有没有进入鬼的占领范围即可。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;题目中已经给出了，在第k秒后所有与鬼的曼哈顿距离不超过2k的位置都会被鬼占领。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;我们在第t秒扩展的时候，判断被扩展的格子是否与某个鬼的曼哈顿距离小于2t即可。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;详见代码及注释&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;时间复杂度&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;每个格子最多只会被扩展一次（如果被扩展了两次，男孩和女孩就会合惹~）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;一共有T组测试数据，每组测试数据的地图有 N×M 个格子，&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;所以时间复杂度是 O(TNM)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;//DC Songxingan
+#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;cmath&amp;gt;
+#include &amp;lt;cstdio&amp;gt;
+#include &amp;lt;cstdlib&amp;gt;
+#include &amp;lt;cstring&amp;gt;
+#include &amp;lt;algorithm&amp;gt;
+#include &amp;lt;queue&amp;gt;
+#define pii pair&amp;lt;int, int&amp;gt;
+using namespace std;
+int n, m;
+int T;
+char a[810][810];
+int reach[810][810]; //统计可达性，男孩为1，女孩为2
+pii girl, boy, z[3]; //男孩、女孩、两个鬼的位置
+int dis(int x1, int y1, int x2, int y2)
+{
+    return abs(x1 - x2) + abs(y1 - y2);
+}
+bool check(int x, int y, int t)
+{
+    if (a[x][y] == &#39;X&#39; || x &amp;gt; n || x &amp;lt; 1 || y &amp;lt; 1 || y &amp;gt; n)
+        return 0;
+    if (dis(x, y, z[1].first, z[1].second) &amp;lt;= 2 * t)
+        return 0;
+    if (dis(x, y, z[2].first, z[2].second) &amp;lt;= 2 * t)
+        return 0;
+    return 1;
+}
+int dx[4] = {0, 0, 1, -1};
+int dy[4] = {1, -1, 0, 0};
+int bfs()
+{
+    int gh = 0;
+    for (int i = 1; i &amp;lt;= n; i++)
+    {
+        for (int j = 1; j &amp;lt;= m; j++)
+        {
+            if (a[i][j] == &#39;M&#39;)
+            {
+                boy.first = i;
+                boy.second = j;
+            }
+            if (a[i][j] == &#39;G&#39;)
+            {
+                girl.first = i;
+                girl.second = j;
+            }
+            if (a[i][j] == &#39;Z&#39;)
+            {
+                gh++;
+                z[gh].first = i;
+                z[gh].second = j;
+            }
+        }
+    }
+    queue&amp;lt;pii&amp;gt; qb, qg;
+    qb.push(boy);
+    qg.push(girl);
+    int step = 0;
+    while (qb.size() || qg.size())
+    {
+        step++;
+        for (int t = 1; t &amp;lt;= 3; t++)
+        { //男孩每步相当于bfs三次
+            int sz = qb.size();
+            for (int j = 1; j &amp;lt;= sz; j++)
+            {
+                int x = qb.front().first;
+                int y = qb.front().second;
+                qb.pop();
+                if (!check(x, y, step))
+                    continue;
+                for (int i = 0; i &amp;lt; 4; i++)
+                {
+                    int nx = x + dx[i];
+                    int ny = y + dy[i];
+                    if (reach[nx][ny] == 1)
+                        continue;
+                    if (!check(nx, ny, step))
+                        continue;
+                    if (reach[nx][ny] == 2)
+                        return step;
+                    reach[nx][ny] = 1;
+                    qb.push(make_pair(nx, ny));
+                }
+            }
+        }
+        int sz = qg.size();
+        for (int j = 1; j &amp;lt;= sz; j++)
+        {
+            int x = qg.front().first;
+            int y = qg.front().second;
+            qg.pop();
+            if (!check(x, y, step))
+                continue;
+            for (int i = 0; i &amp;lt; 4; i++)
+            {
+                int nx = x + dx[i];
+                int ny = y + dy[i];
+                if (reach[nx][ny] == 2)
+                    continue;
+                if (!check(nx, ny, step))
+                    continue;
+                if (reach[nx][ny] == 1)
+                    return step;
+                reach[nx][ny] = 2;
+                qg.push(make_pair(nx, ny));
+            }
+        }
+    }
+    return -1;
+}
+int main()
+{
+    scanf(&amp;quot;%d&amp;quot;, &amp;amp;T);
+    while (T--)
+    {
+        scanf(&amp;quot;%d%d&amp;quot;, &amp;amp;n, &amp;amp;m);
+        for (int i = 1; i &amp;lt;= n; i++)
+            for (int j = 1; j &amp;lt;= m; j++)
+                cin &amp;gt;&amp;gt; a[i][j];
+        memset(reach, 0, sizeof(reach));
+        printf(&amp;quot;%d\n&amp;quot;, bfs());
+    }
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+">【OI学习笔记】双向BFS</a>
+      </div>
+      
+      <div class="item">
+        <a class="result-title" style="opacity: 0;" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-you-xian-dui-lie-bfs/"" data-c="
+          &lt;h2 id=&#34;优先队列bfs&#34;&gt;优先队列BFS&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;在学了双端队列BFS后，我们知道可以怎样处理对于图上边权是1或0的情况。但是对于更加具有普遍性的情况，也就是每次扩展都有各自不同的“代价”时，我们想要求出从初始状态到每个状态的最小代价，就相当于在一张带权图上求出从起点到每个节点的最短路。&lt;/li&gt;
+&lt;li&gt;那么，我们有以下两个方案：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;-方案一&#34;&gt;- 方案一：&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;我们可以采用一般的广搜，用一般的队列来存储。&lt;/li&gt;
+&lt;li&gt;此时因为我们不能保证每个状态第一次入队时就能得到最小代价，所以我们只能允许一个状态多次更新、多次出进队列，从而更新它的最值，直到队列为空。&lt;/li&gt;
+&lt;li&gt;那么我们会发现此时的BFS会对搜索树进行很多重复的遍历与更新，直到求出最优解，其实这就是“迭代”的思想。不妨讨论一下最坏情况，该算法的时间复杂度会从一般的BFS的O(N)变为O(N2)。那么其实在最短路问题中，对应的就是SPFA算法。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;-方案二&#34;&gt;- 方案二：&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;其实除了以上的算法，我们可以通过将一般的队列改为优先队列来进行广搜。&lt;/li&gt;
+&lt;li&gt;形象的说这里的优先队列就相当于一个二叉堆。我们可以每次从队列中取出当前代价最小的状态进行扩展（此时该状态一定已经是最优解，因为队列中其他状态的当前代价都不小于它，所以以后就不能再更新它了），沿着各条分支把到达的新状态加入到优先队列中，不断搜索，直到队列为空。&lt;/li&gt;
+&lt;li&gt;那么我们再看优先队列BFS中，每个状态也会被多次更新、多次进出队列，一个状态可能以不同的代价在队列中同时存在。但是，当每个状态第一次从队列中取出时，就得到了从初始状态到该状态的最小代价。从而之后被取出时，我们就可以直接忽略，不进行扩展。&lt;/li&gt;
+&lt;li&gt;所以，优先队列BFS中每个状态只扩展一次，时间复杂度只多了维护二叉堆的代价。时间复杂度只会从一般BFS的O(N)变为O(N log N)。同样在最短路问题中，对应的是堆优化的Dijkstra算法。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;-那么我们可以对bfs的形式按照对应在图上边权情况进行分类总结&#34;&gt;- 那么我们可以对BFS的形式，按照对应在图上边权情况进行分类总结：&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;问题只求最少步数，等价于在边权都为1的图上求最短路。&lt;br&gt;
+我们使用一般的BFS，时间复杂度为O(N)。&lt;br&gt;
+每个状态只访问入队一次，第一次出队时即为该状态的最小代价。&lt;/li&gt;
+&lt;li&gt;问题每次扩展的代价可能是0或1，等价于在边权只有0或1的图上求最短路。&lt;br&gt;
+使用双端队列，时间复杂度为O(N)。&lt;br&gt;
+每个状态会被更新入队多次，只扩展一次，第一次出队时就是该状态的最小代价。&lt;/li&gt;
+&lt;li&gt;问题每次扩展的代价可能是任意数值，等价于一般的最短路问题。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;(1)使用优先队列BFS，时间复杂度O(N log N)。&lt;/li&gt;
+&lt;li&gt;每个状态被更新入队多次，只扩展一次，第一次出队时即是该状态的最小代价。&lt;/li&gt;
+&lt;li&gt;(2)使用迭代思想+一般的BFS，时间复杂度O(N2)。&lt;/li&gt;
+&lt;li&gt;每个状态被更新入队多次，扩展出队多次，最终完成记忆化搜索后，记录数组中保存了最小代价。&lt;/li&gt;
+&lt;/ul&gt;
+">【OI学习笔记】优先队列BFS</a>
+      </div>
+      
+      <div class="item">
+        <a class="result-title" style="opacity: 0;" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-shuang-duan-dui-lie-bfs/"" data-c="
+          &lt;h2 id=&#34;双端队列bfs&#34;&gt;双端队列BFS&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;在基本的BFS广搜中，每次沿着分支的扩展都记一步，我们通过逐层搜索，解决了求起始状态到每个状态的最少步数问题。这其实等价于在一张边权均为1的图上执行BFS，求出每个点相对于起点的最短距离（层次）。每个状态在第一次被访问并入队时，计算出的步数即为所。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;但是，如果说图上的边权不全是1呢？就比如当图上的边权是1、0两种状态时，每次拓展都有各自不同的“代价”，那么此时要求出起始状态到每个状态的最小代价就需要用到双端队列来保证队列的两段性和单调性。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;deque&#34;&gt;deque&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;deque容器为一个给定类型的元素进行线性处理，像向量一样，它能够快速地随机访问任一个元素，并且能够高效地插入和删除容器的尾部元素。但它又与vector不同，deque支持高效插入和删除容器的头部元素，因此也叫做双端队列。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;它就像是vector与queue的结合。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;与vector相比，deque在头部增删元素仅仅需要O(1)的时间；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;与queue相比，deque像数组一样支持随机访问。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;让我们来看看deque的函数基本操作：&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;1构造&#34;&gt;1.构造&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;无参构造：&lt;/li&gt;
+&lt;li&gt;deque&lt;T&gt; a;　　//&amp;lt;&amp;gt;内自定义数据类型；&lt;/li&gt;
+&lt;li&gt;带参构造：&lt;/li&gt;
+&lt;li&gt;deque(beg,end); //构造函数将[beg, end)区间中的元素拷贝给本身。注意该区间是左闭右开的区间。&lt;/li&gt;
+&lt;li&gt;deque(n,elem); //构造函数将n个elem拷贝给本身。&lt;/li&gt;
+&lt;li&gt;deque(const deque &amp;amp;deq); //拷贝构造函数。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;2-头部尾部的添加和删除接下来的dq为变量名&#34;&gt;2. 头部&amp;amp;尾部的添加和删除(接下来的’dq’为变量名)&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;dq.push_back(elem); //在容器尾部添加一个数据&lt;/li&gt;
+&lt;li&gt;dq.push_front(elem); //在容器头部插入一个数据&lt;/li&gt;
+&lt;li&gt;dq.pop_back(); //删除容器最后一个数据&lt;/li&gt;
+&lt;li&gt;dq.pop_front(); //删除容器第一个数据&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;3中间数据存取&#34;&gt;3.中间数据存取&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;dq.at(idx); //返回索引idx所指的数据，如果idx越界，抛出out_of_range。&lt;/li&gt;
+&lt;li&gt;deque[idx]; //返回索引idx所指的数据，如果idx越界，不抛出异常，直接出错。&lt;/li&gt;
+&lt;li&gt;dq.front(); //返回第一个数据。&lt;/li&gt;
+&lt;li&gt;dq.back(); //返回最后一个数据&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;4元素插入&#34;&gt;4.元素插入&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;dq.insert(pos,elem); //在pos位置插入一个elem元素的拷贝，返回新数据的位置。&lt;/li&gt;
+&lt;li&gt;dq.insert(pos,n,elem); //在pos位置插入n个elem数据，无返回值。&lt;/li&gt;
+&lt;li&gt;dq.insert(pos,beg,end); //在pos位置插入[beg,end)区间的数据，无返回值。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;5数据删除&#34;&gt;5.数据删除&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;dq.clear(); //移除容器的所有数据&lt;/li&gt;
+&lt;li&gt;dq.erase(beg,end); //删除[beg,end)区间的数据，返回下一个数据的位置。&lt;/li&gt;
+&lt;li&gt;dq.erase(pos); //删除pos位置的数据，返回下一个数据的位置。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;6迭代指针&#34;&gt;6.迭代指针&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;dq.begin(); //返回容器中第一个元素的迭代器。&lt;/li&gt;
+&lt;li&gt;dq.end(); //返回容器中最后一个元素之后的迭代器。&lt;/li&gt;
+&lt;li&gt;dq.rbegin(); //返回容器中倒数第一个元素的迭代器。&lt;/li&gt;
+&lt;li&gt;dq.rend(); //返回容器中倒数最后一个元素之后的迭代器。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;7赋值拷贝&#34;&gt;7.赋值&amp;amp;拷贝&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;dq.assign(beg,end); //将[beg, end)区间中的数据拷贝赋值给本身。注意该区间是左闭右开的区间。&lt;/li&gt;
+&lt;li&gt;dq.assign(n,elem); //将n个elem拷贝赋值给本身。&lt;/li&gt;
+&lt;li&gt;deque&amp;amp; operator=(const deque &amp;amp;deq); //重载等号操作符&lt;/li&gt;
+&lt;li&gt;dq.swap(deq); // 将vec与本身的元素互换&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;8大小判断非空&#34;&gt;8.大小&amp;amp;判断非空&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;dq.size(); //返回容器中元素的个数&lt;/li&gt;
+&lt;li&gt;dq.empty(); //判断容器是否为空&lt;/li&gt;
+&lt;li&gt;dq.resize(num); //重新指定容器的长度为num，若容器变长，则以默认值填充新位置。如果容器变短，则末尾超出容器长度的元素被删除。&lt;/li&gt;
+&lt;li&gt;dq.resize(num, elem); //重新指定容器的长度为num，若容器变长，则以elem值填充新位置。如果容器变短，则末尾超出容器长度的元素被删除。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;例题电路维修&#34;&gt;&lt;a href=&#34;https://www.acwing.com/problem/content/177/&#34;&gt;【例题】电路维修&lt;/a&gt;&lt;/h2&gt;
+&lt;h3 id=&#34;题解&#34;&gt;题解&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;双端队列主要解决图中边的权值只有0或者1的最短路问题&lt;/li&gt;
+&lt;li&gt;操作：&lt;/li&gt;
+&lt;li&gt;每次从队头取出元素，并进行拓展其他元素时
+&lt;ol&gt;
+&lt;li&gt;若拓展某一元素的边权是0，则将该元素插入到队头&lt;/li&gt;
+&lt;li&gt;若拓展某一元素的边权是1，则将该元素插入到队尾&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;回归到题目：&lt;br&gt;
+首先明确的一点是，这里是图中的格子和点是不一样的，点是格子上的角角上的点，每个点都有4个方向可以走，分别对应的是左上角，右上角，右下角，左下角。&lt;/li&gt;
+&lt;li&gt;特别注意：判断“/”C++中要写成“//”！踩过格子到达想去的点时，需要判断是否需要旋转电线，若旋转电线表示从 当前点到想去的点的边权是1，若不旋转电线则边权是0&lt;/li&gt;
+&lt;li&gt;按左上角，右上角，右下角，左下角遍历的顺序：
+&lt;ol&gt;
+&lt;li&gt;dx[ ]和dy[ ]表示可以去其他点的方向&lt;/li&gt;
+&lt;li&gt;id[ ]和iy[ ]表示需要踩某个方向的各种才能去到相应的点&lt;/li&gt;
+&lt;li&gt;cs[ ]表示当前点走到4个方向的点理想状态下格子形状(边权是0的状态)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;时间复杂度 O(nm)&lt;/li&gt;
+&lt;li&gt;如下面的程序就用“BFS+双端队列”就解决了该问题：&lt;/li&gt;
+&lt;li&gt;（蒟蒻的双端队列用STL的deque实现，要程序跑得更快，可以手写双端队列）：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;//DC Songxingan
+#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;cmath&amp;gt;
+#include &amp;lt;cstdio&amp;gt;
+#include &amp;lt;cstdlib&amp;gt;
+#include &amp;lt;cstring&amp;gt;
+#include &amp;lt;algorithm&amp;gt;
+#include &amp;lt;queue&amp;gt;
+using namespace std;
+const int maxn = 510;
+int t, n, m, ans[maxn][maxn];
+char map[maxn][maxn];
+struct Node
+{
+    int x, y;
+};  //坐标
+deque&amp;lt;Node&amp;gt; dq;  //双端队列
+
+void BFS()  //广搜
+{
+    while (!dq.empty())
+    {
+        Node lin, now;
+        lin = dq.front();
+        dq.pop_front();
+//-----从4个方向搜索可到格点-----
+        if (lin.x &amp;gt; 1 &amp;amp;&amp;amp; lin.y &amp;gt; 1)  //边界判断
+        {
+            now.x = lin.x - 1;
+            now.y = lin.y - 1;  //更新搜索的点坐标
+            int flag = 0;
+            if (map[now.x][now.y] != &#39;\\&#39;)  //若要旋转则边权为1
+            {
+                flag = 1;
+            }
+
+            if (ans[now.x][now.y] &amp;gt; ans[lin.x][lin.y] + flag)
+//判断当前搜索的点是否已经被搜过或是否是最有解
+            {
+                ans[now.x][now.y] = ans[lin.x][lin.y] + flag;
+//边权值为1 放在队尾，为0放在队首
+                if (flag)
+                    dq.push_back(now);
+                else
+                    dq.push_front(now);
+            }
+        }
+//接下剩下3个方向搜索同理
+        if (lin.x &amp;gt; 1 &amp;amp;&amp;amp; lin.y &amp;lt;= m)
+        {
+            now.x = lin.x - 1;
+            now.y = lin.y + 1;
+            int flag = 0;
+            if (map[now.x][lin.y] != &#39;/&#39;)
+            {
+                flag = 1;
+            }
+
+            if (ans[now.x][now.y] &amp;gt; ans[lin.x][lin.y] + flag)
+            {
+                ans[now.x][now.y] = ans[lin.x][lin.y] + flag;
+                if (flag)
+                    dq.push_back(now);
+                else
+                    dq.push_front(now);
+            }
+        }
+        if (lin.x &amp;lt;= n &amp;amp;&amp;amp; lin.y &amp;lt;= m)
+        {
+            now.x = lin.x + 1;
+            now.y = lin.y + 1;
+            int flag = 0;
+            if (map[lin.x][lin.y] != &#39;\\&#39;)
+            {
+                flag = 1;
+            }
+
+            if (ans[now.x][now.y] &amp;gt; ans[lin.x][lin.y] + flag)
+            {
+                ans[now.x][now.y] = ans[lin.x][lin.y] + flag;
+                if (flag)
+                    dq.push_back(now);
+                else
+                    dq.push_front(now);
+            }
+        }
+        if (lin.x &amp;lt;= n &amp;amp;&amp;amp; lin.y &amp;gt; 1)
+        {
+            now.x = lin.x + 1;
+            now.y = lin.y - 1;
+            int flag = 0;
+            if (map[lin.x][now.y] != &#39;/&#39;)
+            {
+                flag = 1;
+            }
+
+            if (ans[now.x][now.y] &amp;gt; ans[lin.x][lin.y] + flag)
+            {
+                ans[now.x][now.y] = ans[lin.x][lin.y] + flag;
+                if (flag)
+                    dq.push_back(now);
+                else
+                    dq.push_front(now);
+            }
+        }
+    }
+}
+int main()
+{
+    scanf(&amp;quot;%d&amp;quot;, &amp;amp;t);
+    while (t--)
+    {
+        scanf(&amp;quot;%d%d&amp;quot;, &amp;amp;n, &amp;amp;m);
+        for (int i = 1; i &amp;lt;= n; ++i)
+        {
+            scanf(&amp;quot;%s&amp;quot;, map[i] + 1);
+        }
+        if ((n + m) % 2 == 1)  //可行性剪枝：如果行数加列数不是偶数则无解
+        {
+            printf(&amp;quot;NO SOLUTION\n&amp;quot;);
+            continue;
+        }
+//------初始化------
+        Node fir;
+        fir.x = 1;
+        fir.y = 1;
+        dq.clear();
+        dq.push_front(fir);
+        memset(ans, 0x7f, sizeof(ans));
+        ans[1][1] = 0;
+        BFS();
+        printf(&amp;quot;%d\n&amp;quot;, ans[n + 1][m + 1]);  //注意输出的是格点
+    }
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+">【OI学习笔记】双端队列BFS</a>
+      </div>
+      
+      <div class="item">
+        <a class="result-title" style="opacity: 0;" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-zhuang-tai-tu-sou-suo/"" data-c="
+          &lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;BFS搜索处理的对象有很多种（根据题目而定），除了数它还可能是一个状态，对于状态空间的就叫做状态图搜索。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;状态空间搜索一般是找到一条从初始状态到最终状态的一条最优路径，可以归结为隐式图的搜索问题，图中的节点就是在搜索过程中的状态。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;八数码问题&#34;&gt;八数码问题&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;在一个3*3的方棋盘上放置着1,2,3,4,5,6,7,8八个数码,每个数码占一格,且有一个空格（输入用‘0’表示）。这些数码可以在棋盘上移动，其移动规则是：与空格相邻的数码方格可以移入空格。现在的问题是：对于指定的初始棋局和目标棋局（如图5.1.1-1所示），任务1：问最小移动步数，若无法到达输出-1；任务2：给出数码的移动序列。该问题称八数码难题或者重排九宫问题。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;输入样例：&lt;br&gt;
+1 2 3 0 8 4 7 6 5&lt;br&gt;
+1 0 3 8 2 4 7 6 5&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;输出样例：&lt;br&gt;
+2&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;不难把八数码问题归结为图上的最短路问题，图的“结点”就是9个格子中的滑块编号（从上到下、从左到右把它们放到一个包含9个元素的数组中）。无权图上的最短路问题可以用BFS求解。从初始状态出发，每次搜索转移状态，一层层搜索，渐渐接近目标状态，那么到达目标状态时经过的步数就是最短路径。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;这道题目主要的难点就是判断重复，显然直接判断矩阵最坏情况是比较9!*9!（9!=362880）次，如此暴力判断重复不可行，一定会超时，故使用哈希方法，字符串存储数码，然后使用康托展开来判断重复。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;康拓展开&#34;&gt;*康拓展开&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;康托展开是一个全排列到一个自然数的双射，常用于构建Hash表时的空间压缩。康托展开的实质是计算当前排列在所有由小到大全排列中的顺序，设有n个数{1,2,3,...,n}，可以有组成不同(n!种)的排列组合，康托展开表示的就是在n个不同元素的全排列中, 比当前排列组合小的个数，那么也可以表示当前排列组合在n个不同元素的全排列中的名次（当前的名次 = 比当前排列组合小的个数 + 1）。因此也是可逆的，先给出康托展开的公式：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;[&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;]&lt;/mo&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;[&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;]&lt;/mo&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi mathvariant=&#34;normal&#34;&gt;.&lt;/mi&gt;&lt;mi mathvariant=&#34;normal&#34;&gt;.&lt;/mi&gt;&lt;mi mathvariant=&#34;normal&#34;&gt;.&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;[&lt;/mo&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo&gt;]&lt;/mo&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi mathvariant=&#34;normal&#34;&gt;.&lt;/mi&gt;&lt;mi mathvariant=&#34;normal&#34;&gt;.&lt;/mi&gt;&lt;mi mathvariant=&#34;normal&#34;&gt;.&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;[&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;]&lt;/mo&gt;&lt;mo&gt;∗&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;x = a[n] \times (n - 1)! + a[n - 1] \times (n - 2)! + ...+ a[i] \times (i- 1)! + ... +  a[1] * 0!&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.43056em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2777777777777778em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mrel&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2777777777777778em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;−&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;−&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;−&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.66666em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;−&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.66666em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;∗&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.69444em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;其中, a[i]为整数，（注意：i从右往左数）并且0 &amp;lt;= a[i] &amp;lt;= i, 0 &amp;lt;= i &amp;lt; n, 表示当前未出现的的元素中排第几个，这就是康托展开。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;假设有一个排列{1,2,3}，则其排列组合及其相应的康托展开值如下：&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;排列组合&lt;/th&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;名次&lt;/th&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;康拓展开&lt;/th&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;值&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;123&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;1&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;0 \times 2! + 0 \times 1! + 0 \times 0!&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.69444em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;132&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;2&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;0 \times 2! + 1 \times 1! + 0 \times 0!&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.69444em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;213&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;3&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;1 \times 2! + 0 \times 1! + 0 \times 0!&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.69444em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;231&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;4&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;1 \times 2! + 1 \times 1! + 0 \times 0!&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.69444em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;312&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;5&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;2 \times 2! + 0 \times 1! + 0 \times 0!&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.69444em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;321&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;6&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;2 \times 2! + 1 \times 1! + 0 \times 0!&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.69444em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;5&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;举个例子，在(1,2,3,4,5)5个数的排列组合中，计算 34152的康托展开值。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;首位是3，则小于3的数有两个，为1和2，a[5] = 2，则首位小于3的所有排列组合为 &lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;[&lt;/mo&gt;&lt;mn&gt;5&lt;/mn&gt;&lt;mo&gt;]&lt;/mo&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mn&gt;5&lt;/mn&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;a[5] \times (5-1)!&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;−&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;第二位是4，则小于4的数有两个，为1和2，注意这里3并不能算，因为3已经在第一位，所以其实计算的是在第二位之后小于4的个数。因此 a[4] = 2&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;第三位是1，则在其之后小于1的数有0个，所以 a[3] = 0&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;第四位是5，则在其之后小于5的数有1个，为2，所以 a[2] = 1&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;最后一位就不用计算啦，因为在它之后已经没有数了，所以 a[1] 固定为0&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;根据公式：&lt;br&gt;
+&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;4&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;3&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;0&lt;/mn&gt;&lt;mo&gt;!&lt;/mo&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;24&lt;/mn&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mn&gt;6&lt;/mn&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;61&lt;/mn&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;x = 2 \times 4! + 2 \times 3! + 0 \times 2! + 1 \times 1! + 0 \times 0! = 2 \times 24 + 2 \times 6 + 1 = 61&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.43056em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2777777777777778em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mrel&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2777777777777778em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;4&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.77777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.69444em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2777777777777778em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mrel&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2777777777777778em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;4&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;×&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.72777em;vertical-align:-0.08333em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222222222222222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.64444em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2777777777777778em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mrel&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2777777777777778em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.64444em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;所以比 34152 小的组合有61个，即34152是排第62。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;逆康托展开&#34;&gt;*逆康托展开&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;一开始已经提过了，康托展开是一个全排列到一个自然数的双射，因此是可逆的。即对于上述例子，在(1,2,3,4,5)给出61可以算出起排列组合为34152。由上述的计算过程可以容易的逆推回来，具体过程如下：&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;用 61 / 4! = 2余13，说明 a[5] = 2 ,说明比首位小的数有2个，所以首位为3。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;用 13 / 3! = 2余1，说明 a[4] = 2 ，说明在第二位之后小于第二位的数有2个，所以第二位为4。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;用 1 / 2! = 0余1，说明 a[3] = 0 ，说明在第三位之后没有小于第三位的数，所以第三位为1。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;用 1 / 1! = 1余0，说明 a[2] = 1 ，说明在第二位之后小于第四位的数有1个，所以第四位为5。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;最后一位自然就是剩下的数2啦。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;通过以上分析，所求排列组合为 34152。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;-如下面的程序就用bfscantor就解决了八数码问题&#34;&gt;- 如下面的程序就用“BFS+Cantor”就解决了八数码问题：&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;（BFS中用STL的queue实现）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;
+//DC Songxingan
+#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;cmath&amp;gt;
+#include &amp;lt;cstdio&amp;gt;
+#include &amp;lt;cstdlib&amp;gt;
+#include &amp;lt;cstring&amp;gt;
+#include &amp;lt;algorithm&amp;gt;
+#include &amp;lt;queue&amp;gt;
+using namespace std;
+const int LEN = 362888; //状态共9!=362880种
+struct node
+{
+    int state[9]; //记录一个八数码的排列，即一个状态
+    int dis;      //记录到起点的距离
+};
+
+int dir[4][2] = {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
+//左、上、右、下顺时针方向。左上角坐标是(0,0)
+int visited[LEN] = {0};
+//与每个状态对应的记录，Cantor函数对它置数，并判重
+int start[9]; //开始状态
+int goal[9];  //目标状态
+long int factory[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880};
+//Cantor用到的常数
+bool Cantor(int str[], int n)
+{ //用康托展开判重
+    long result = 0;
+    for (int i = 0; i &amp;lt; n; i++)
+    {
+        int counted = 0;
+        for (int j = i + 1; j &amp;lt; n; j++)
+        {
+            if (str[i] &amp;gt; str[j]) //当前未出现的元素中是排在第几个
+                ++counted;
+        }
+        result += counted * factory[n - i - 1];
+    }
+    if (!visited[result])
+    { //没有被访问过
+        visited[result] = 1;
+        return 1;
+    }
+    else
+        return 0;
+}
+int bfs()
+{
+    node head;
+    memcpy(head.state, start, sizeof(head.state)); //复制起点的状态
+    head.dis = 0;
+    queue&amp;lt;node&amp;gt; q; //队列中放状态
+    Cantor(head.state, 9);
+    //用康托展开判重，目的是对起点的visited[]赋初值
+    q.push(head); //第一个进队列的是起点状态
+
+    while (!q.empty())
+    { //处理队列
+        head = q.front();
+        q.pop();
+        //可在此处打印head.state，看弹出队列的情况
+        int z;
+        for (z = 0; z &amp;lt; 9; z++)     //找这个状态中元素0的位置
+            if (head.state[z] == 0) //找到了
+                break;
+        //转化为二维，左上角是原点(0, 0)。
+        int x = z % 3; //横坐标
+        int y = z / 3; //纵坐标
+        for (int i = 0; i &amp;lt; 4; i++)
+        {
+            //上、下、左、右最多可能有4个新状态
+            int newx = x + dir[i][0]; //元素0转移后的新坐标
+            int newy = y + dir[i][1];
+            int nz = newx + 3 * newy; //转化为一维
+            if (newx &amp;gt;= 0 &amp;amp;&amp;amp; newx &amp;lt; 3 &amp;amp;&amp;amp; newy &amp;gt;= 0 &amp;amp;&amp;amp; newy &amp;lt; 3)
+            { //未越界
+                node newnode;
+                memcpy(&amp;amp;newnode, &amp;amp;head, sizeof(struct node));
+                //复制这新的状态
+                swap(newnode.state[z], newnode.state[nz]);
+                //把0移动到新的位置
+                newnode.dis++;
+                if (memcmp(newnode.state, goal, sizeof(goal)) == 0)
+                    //与目标状态对比
+                    return newnode.dis;       //到达目标状态，返回距离，结束
+                if (Cantor(newnode.state, 9)) //用康托展开判重
+                    q.push(newnode);          //把新的状态放进队列
+            }
+        }
+    }
+    return -1; //没找到
+}
+int main()
+{
+    for (int i = 0; i &amp;lt; 9; i++)
+        cin &amp;gt;&amp;gt; start[i]; //初始状态
+    for (int i = 0; i &amp;lt; 9; i++)
+        cin &amp;gt;&amp;gt; goal[i]; //目标状态
+    int num = bfs();
+    if (num != -1)
+        cout &amp;lt;&amp;lt; num &amp;lt;&amp;lt; endl;
+    else
+        cout &amp;lt;&amp;lt; &amp;quot;Impossible&amp;quot; &amp;lt;&amp;lt; endl;
+    return 0;
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;注意到这一道题，其实有很多方法解决，例如：双向广搜、A*、IDA&lt;em&gt;等等。八数码问题只有9！种状态，对于更大的问题，例如4&lt;/em&gt;4的15数码问题，就有16!≈2×1013种状态，就需要更好的方法，具体可见：https://www.cnblogs.com/zufezzt/p/5659276.html（八境界）&lt;/li&gt;
+&lt;/ul&gt;
+">【OI学习笔记】状态图搜索</a>
+      </div>
+      
+      <div class="item">
+        <a class="result-title" style="opacity: 0;" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-sou-suo-jian-zhi/"" data-c="
+          &lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;搜索算法的时间复杂度大多是指数级的，难以满足对程序运行时间的限制要求，为使降低时间复杂度，对深度优先搜索可以进行一种优化的基本方法——剪枝。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;剪枝，就是减小搜索树的规模、尽早排除搜索树中一些不必要的分支的一种手段技巧。搜索的进程可以看做是从树根出发，遍历一颗倒置树（搜索树）的过程，所谓剪枝，就是通过某些判断，避免一些不必要的遍历过程，形象的说，就好像是减去搜索树中的某些枝条，也顾名思义叫做“剪枝”。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure data-type=&#34;image&#34; tabindex=&#34;1&#34;&gt;&lt;img src=&#34;https://www.imageoss.com/images/2022/02/27/OI03305db50931c11e.png&#34; alt=&#34;搜索剪枝&#34; loading=&#34;lazy&#34;&gt;&lt;/figure&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;显而易见，应用剪枝优化的核心问题是设计剪枝判断方法，即确定哪些枝条舍弃哪些枝条保留，设计出好的剪枝判断方法，可以使得程序运行时间大大缩短，否则会适得其反。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;剪枝的原则：正确、准确、高效&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;剪枝优化技巧&#34;&gt;剪枝优化技巧&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;优化搜索顺序&lt;br&gt;
+在不同的搜索问题中，搜索树的各个层次、各个分支之间的顺序不是固定的，不同的搜索顺序会产生不同的搜索树形态，其规模大小也相差甚远。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;排除等效冗余&lt;br&gt;
+在搜索过程中，若能判断从搜索树当前节点上沿某几条不同分支到达的子树是相同的，那么只需对其中一条分支执行搜索。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;可行性剪枝&lt;br&gt;
+可行性剪枝也叫上下界剪枝，其是指在搜索过程中，及时对当前状态进行检查，若发现分支已无法到达递归边界，就执行回溯。这就好比我们在道路上行走时，远远看到前方是一条死胡同，就应该立即折返，重新选择道路，而不是走到头再折返。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;最优性剪枝&lt;br&gt;
+在最优化问题的搜索过程中，若当前花费的代价已超过当前搜索到的最优解，那么无论采取多么优秀的策略到达递归边界，都不可能更新答案，此时可以停止对当前分支的搜索进行回溯。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;记忆化&lt;br&gt;
+记忆化正如字面意思，记录每个状态的搜索结果，在重复遍历一个状态时直接检索并返回。这就好比我们对图进行深度优先遍历时，标记一个节点时是否已经被访问过，可以直接调用记录的数据，就可以节省再次重复计算的时间。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+">【OI学习笔记】搜索剪枝</a>
+      </div>
+      
+      <div class="item">
+        <a class="result-title" style="opacity: 0;" href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-er-fen-suan-fa/"" data-c="
+          &lt;h2 id=&#34;二分算法&#34;&gt;二分算法&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;二分的本质并不是单调性，如果有单调性一定可以二分，可以二分但不一定有单调性。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;二分的本质：边界。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;整数二分&#34;&gt;整数二分&lt;/h2&gt;
+&lt;h3 id=&#34;整数二分算法模板&#34;&gt;整数二分算法模板：&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;二分模板一共有两个，分别适用于不同情况。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;算法思路：假设目标值在闭区间[l, r]中， 每次将区间长度缩小一半，当l = r时，我们就找到了目标值。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;版本1&#34;&gt;版本1&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;当我们将区间[l, r]划分成[l, mid]和[mid + 1, r]时，其更新操作是r = mid或者l = mid + 1;计算mid时不需要加1。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;int bsearch_1(int l, int r)
+{
+	while (l &amp;lt; r)
+	{
+		int mid = l + r &amp;gt;&amp;gt; 1;
+		if (check(mid))
+			r = mid;
+		else
+			l = mid + 1;
+	}
+	return l;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;版本2&#34;&gt;版本2&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;当我们将区间[l, r]划分成[l, mid - 1]和[mid, r]时，其更新操作是r = mid - 1或者l = mid;，此时为了防止死循环，计算mid时需要加1。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;int bsearch_2(int l, int r)
+{
+	while (l &amp;lt; r)
+	{
+		int mid = l + r + 1 &amp;gt;&amp;gt; 1;
+		if (check(mid))
+			l = mid;
+		else
+			r = mid - 1;
+	}
+	return l;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;整数二分算法模板-模板题-acwing-789-数的范围&#34;&gt;整数二分算法模板 —— 模板题  &lt;a href=&#34;https://www.acwing.com/problem/content/791/&#34;&gt;AcWing 789. 数的范围&lt;/a&gt;&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;bool check(int x)
+{ 
+	/* ... */
+} // 检查x是否满足某种性质
+
+// 区间[l, r]被划分成[l, mid]和[mid + 1, r]时使用：
+int bsearch_1(int l, int r)
+{
+	while (l &amp;lt; r)
+	{
+		int mid = l + r &amp;gt;&amp;gt; 1;
+		if (check(mid))
+			r = mid; // check()判断mid是否满足性质
+		else
+			l = mid + 1;
+	}
+	return l;
+}
+// 区间[l, r]被划分成[l, mid - 1]和[mid, r]时使用：
+int bsearch_2(int l, int r)
+{
+	while (l &amp;lt; r)
+	{
+		int mid = l + r + 1 &amp;gt;&amp;gt; 1;
+		if (check(mid))
+			l = mid;
+		else
+			r = mid - 1;
+	}
+	return l;
+}
+&lt;/code&gt;&lt;/pre&gt;
+">【OI学习笔记】二分算法</a>
+      </div>
+      
+      <div class="item">
+        <a class="result-title" style="opacity: 0;" href="https://song-gan.github.io/post/about/"" data-c="
+          &lt;h2 id=&#34;欢迎来到crystal_gan的网站呀很高兴遇见你&#34;&gt;&amp;gt; 欢迎来到Crystal_gan的网站呀，很高兴遇见你！🤝&lt;/h2&gt;
+&lt;figure data-type=&#34;image&#34; tabindex=&#34;1&#34;&gt;&lt;img src=&#34;https://www.imageoss.com/images/2022/02/14/background_article-1d1fd32f7921734bd.png&#34; alt=&#34;&#34; loading=&#34;lazy&#34;&gt;&lt;/figure&gt;
+&lt;h2 id=&#34;关于本站&#34;&gt;🏠 关于本站&lt;/h2&gt;
+&lt;p&gt;一位Oler的学习Blog&lt;/p&gt;
+&lt;h2 id=&#34;博主是谁&#34;&gt;👨‍💻 博主是谁&lt;/h2&gt;
+&lt;p&gt;Crystal_gan&lt;br&gt;
+可以关注蒟蒻的luogu账号：凌寒（网址:https://www.luogu.com.cn/user/109660）&lt;/p&gt;
+&lt;h2 id=&#34;联系我呀&#34;&gt;📬 联系我呀&lt;/h2&gt;
+&lt;p&gt;QQ：1571098875（加好友请备注）&lt;/p&gt;
+">关于</a>
+      </div>
+      
+    </div>
+    <div class="page">
+      <div id="page_ul"></div>
+    </div>
+  </div>
+</div>
+<script>
+  !function () {
+    let searchMask = document.querySelector('#search_mask');
+    let result = document.querySelector('#result');
+    let items = document.querySelectorAll('.item');
+    let searchBox = document.querySelector('#search');
+    let statCount = document.querySelector('#stat_count');
+    let statTimes = document.querySelector('#stat_times');
+    let pageUl = document.querySelector('#page_ul');
+    let close = document.querySelector('#close');
+    
+    close.addEventListener('click', function() {
+      searchMask.style = 'display: none;'
+    })
+
+    let finds = [];
+    let contents = [];
+    let pageSize = 10;
+    items.forEach(item => {
+      let a = item.querySelector('a');
+      contents.push({
+        title: a.innerText,
+        details: a.dataset.c,
+        link: a.href
+      })
+      item.remove();
+    })
+
+    function insertStr(soure, start, count) {
+      let newStr = soure.substr(start, count);
+      return soure.slice(0, start) + '<em>' + newStr + '</em>' + soure.slice(start + count);
+    }
+
+    pageUl.addEventListener('click', function(event) {
+      let target = event.target;
+      if (target.__proto__ === HTMLSpanElement.prototype) {
+        appendResults(parseInt(target.dataset.i));
+      }
+    })
+
+    function appendResults(index) {
+      let htmlResult = '';
+      let start = index || 0;
+      let end = Math.min(start + pageSize, finds.length);
+      for (let i = start; i < end; i++) {
+        const current = finds[i];
+        let html = current.title;
+        let sum = 0;
+        let positions = current.positions;
+        positions.forEach(position => {
+          html = insertStr(html, position.start + sum, position.count);
+          sum += 9;
+        })
+        htmlResult += `<div class="item"><a class="result-title" href="${current.link}">${html}</a></div>`;
+      }
+      result.innerHTML = htmlResult;
+      pageUl.innerHTML = '';
+      let count = finds.length / pageSize;
+      let lis = '';
+      if (start !== 0) {
+        lis += `<span class="fa fa-angle-left" data-i='${start - 1}'></span>`;
+      }
+      for (let i = 0; i < count; i++) {
+        lis += `<span class='${i === start?'current':''}' data-i='${i}'>${i+1}</span>`;     
+      }
+      if (start+1 < count) {
+        lis += `<span class="fa fa-angle-right" data-i='${start+1}'></span>`;  
+      }
+      pageUl.innerHTML = lis;
+    }
+
+    function search(delay) {
+      let timer = null
+      return function () {
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+          let start = Date.now();
+          let segments = searchBox.value.split(' ').filter(c => c != '');
+          if (segments.length <= 0) {
+            return;
+          }
+          finds = [];
+          let htmlResult = '';
+          contents.forEach(content => {
+            let title = content.title;
+            let positions = [];
+            let find = false;
+            segments.forEach((segment) => {
+              if (content.title.includes(segment)) {
+                find = true;
+                positions.push({
+                  start: content.title.indexOf(segment),
+                  count: segment.length
+                })
+              } else if (content.details.includes(segment)) {
+                find = true;
+              }
+            });
+            if (find) {
+              finds.push({
+                title: content.title,
+                link: content.link,
+                positions
+              });
+            }
+          })
+          appendResults(0);
+          statCount.textContent = finds.length;
+          statTimes.textContent = Date.now() - start;
+        }, delay)
+      }
+    }
+    searchBox.addEventListener('input', search(200));
+  }()
+</script>
+
+<input hidden id="copy" />
+<script>
+  !function () {
+    let times = document.querySelectorAll('.publish-time');
+    for (let i = 0; i < times.length; i++) {
+      let date = times[i].dataset.t;
+      let time = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
+      if (time < 60) {
+        str = time + '秒之前';
+      } else if (time < 3600) {
+        str = Math.floor(time / 60) + '分钟之前';
+      } else if (time >= 3600 && time < 86400) {
+        str = Math.floor(time / 3600) + '小时之前';
+      } else if (time >= 86400 && time < 259200) {
+        str = Math.floor(time / 86400) + '天之前';
+      } else {
+        str = times[i].textContent;
+      }
+      times[i].textContent = str;
+    }
+  }();
+</script>
+
+<script>
+  let language = '';
+  if (language !== '') {
+    let map = new Map();
+    if (language === 'en') {
+      map.set('search', 'Search');
+      map.set('category', 'Categories');
+      map.set('article', 'Articles');
+      map.set('tag', 'Tags');
+      map.set('top', 'Top');
+      map.set('publish', 'published');
+      map.set('minute', ' minutes');
+      map.set('read-more', 'Read More');
+      map.set('view', 'View');
+      map.set('words', ' words');
+      map.set('category-in', 'category in');
+      map.set('preview', 'Meta');
+      map.set('index', 'Toc');
+      map.set('no-archives', "You haven't created yet");
+      map.set('archives', " articles in total");
+      map.set('cloud-tags', " tags in total");
+      map.set('copyright', "Copyright: ");
+      map.set('author', "Author: ");
+      map.set('link', "Link: ");
+      map.set('leave-message', "Leave a message");
+      map.set('format', "Links Format");
+      map.set('site-name', "Name: ");
+      map.set('site-link', "Link: ");
+      map.set('site-desc', "Desc: ");
+      map.set('stat', " related results, taking ");
+      map.set('stat-time', " ms");
+      map.set('site-img', "Image: ");
+    }
+
+    if (map.size > 0) {
+      let lanElems = document.querySelectorAll('.language');
+      lanElems.forEach(elem => {
+        let lan = elem.dataset.lan, text = map.get(lan);
+        if (elem.__proto__ === HTMLInputElement.prototype) {
+          elem.placeholder = text
+        } else {
+          if (elem.dataset.count) {
+            text = elem.dataset.count + text;
+          }
+          elem.textContent = text;
+        }
+      })
+    }
+  }
+
+  window.Clipboard = (function (window, document, navigator) {
+    var textArea,
+      copy;
+
+    // 判断是不是ios端
+    function isOS() {
+      return navigator.userAgent.match(/ipad|iphone/i);
+    }
+    //创建文本元素
+    function createTextArea(text) {
+      textArea = document.createElement('textArea');
+      textArea.value = text;
+      textArea.style.width = 0;
+      textArea.style.height = 0;
+      textArea.clientHeight = 0;
+      textArea.clientWidth = 0;
+      document.body.appendChild(textArea);
+    }
+    //选择内容
+    function selectText() {
+      var range,
+        selection;
+
+      if (isOS()) {
+        range = document.createRange();
+        range.selectNodeContents(textArea);
+        selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        textArea.setSelectionRange(0, 999999);
+      } else {
+        textArea.select();
+      }
+    }
+
+    //复制到剪贴板
+    function copyToClipboard() {
+      try {
+        document.execCommand("Copy")
+      } catch (err) {
+        alert("复制错误！请手动复制！")
+      }
+      document.body.removeChild(textArea);
+    }
+
+    copy = function (text) {
+      createTextArea(text);
+      selectText();
+      copyToClipboard();
+    };
+
+    return {
+      copy: copy
+    };
+  })(window, document, navigator);
+
+  function copyCode(e) {
+    if (e.srcElement.tagName === 'SPAN' && e.srcElement.classList.contains('copy-code')) {
+      let code = e.currentTarget.querySelector('code');
+      var text = code.innerText;
+      if (e.srcElement.textContent === '复制成功') {
+        return;
+      }
+      e.srcElement.textContent = '复制成功';
+      (function (elem) {
+        setTimeout(() => {
+          if (elem.textContent === '复制成功') {
+            elem.textContent = '复制代码'
+          }
+        }, 1000);
+      })(e.srcElement)
+      Clipboard.copy(text);
+    }
+  }
+
+  let pres = document.querySelectorAll('pre');
+  pres.forEach(pre => {
+    let code = pre.querySelector('code');
+    let copyElem = document.createElement('span');
+    copyElem.classList.add('copy-code');
+    copyElem.textContent = '复制代码';
+    pre.appendChild(copyElem);
+    pre.onclick = copyCode
+  })
+
+</script>
+<script src="/media/js/motion.js"></script>
+
+
+  <script
+    src="https://cdn.jsdelivr.net/gh/cferdinandi/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
+  <script>
+    var scroll = new SmoothScroll('a[href*="#"]', {
+      speed: 200
+    });
+  </script>
+
+
+
+<script src="/media/js/mouse/love.js"></script>
+
+
+  <script src="/media/js/cool.js"></script>
+
+
+
+  <script src="https://cdn.jsdelivr.net/gh/yremp/yremp-js@1.5/sakura.js"></script>
+
+</html>
