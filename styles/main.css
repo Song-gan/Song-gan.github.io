@@ -2060,11 +2060,11 @@ body {
         margin: 0 auto;
       }
     @font-face {
-      font-family: '方正少儿简体';
-      src: url('/media/fonts/方正少儿简体.ttf');
+      font-family: '汉仪书魂体简';
+      src: url('/media/fonts/汉仪书魂体简.ttf');
     }
     * {
-        font-family: '方正少儿简体';
+        font-family: '汉仪书魂体简';
     }
     .katex-block *{
       font-family: 'KaTeX_Main';
