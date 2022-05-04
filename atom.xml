@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://song-gan.github.io</id>
     <title>Crystal_gan</title>
-    <updated>2022-04-27T06:01:39.675Z</updated>
+    <updated>2022-05-04T06:06:24.692Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://song-gan.github.io"/>
     <link rel="self" href="https://song-gan.github.io/atom.xml"/>
@@ -10,6 +10,46 @@
     <logo>https://song-gan.github.io/images/avatar.png</logo>
     <icon>https://song-gan.github.io/favicon.ico</icon>
     <rights>All rights reserved 2022, Crystal_gan</rights>
+    <entry>
+        <title type="html"><![CDATA[【中考游记】物化实验操作]]></title>
+        <id>https://song-gan.github.io/post/zhong-kao-you-ji-wu-hua-shi-yan-cao-zuo/</id>
+        <link href="https://song-gan.github.io/post/zhong-kao-you-ji-wu-hua-shi-yan-cao-zuo/">
+        </link>
+        <updated>2022-04-29T05:36:00.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="font-size5-colorred記font物化实验操作"><font size="5" color="red">『記』</font>物化实验操作</h2>
+<h3 id="2022年4月28日"><strong>2022年4月28日</strong></h3>
+<ul>
+<li>对于物化实验操作考试，我想应该和地生实验操作考试一样一样的吧，就没有花太多时间准备。</li>
+<li>在考试之前一共去了3次化学实验室，2次物理实验室，(每一次都是全部做完了实验)</li>
+<li>化学实验室的有趣化学反应:</li>
+</ul>
+<ol>
+<li>向试管中缓慢倾倒1~2mL “王zh”溶液，注意不要倒太多，刚刚盖过试管底部即可</li>
+<li>再用胶头滴管向试管中滴加“田zr”溶液，震荡并观察现象。</li>
+<li>实验报告: 观察到“王zh”溶液与“田zr”溶液剧烈反应，放出大量热量，有许多气泡产生，并听见溶液中发出“滚出去！&quot;的声音。</li>
+</ol>
+<ul>
+<li>物理实验室的花絮：</li>
+</ul>
+<ol>
+<li>做完了全部实验，我好奇连接了一个简单电路，并接上了18V的电源（串联3个6V的电源），顿时整个物理实验室闪闪发亮，头顶的白炽灯成了装饰，张妈妈拿着棍子，站在后门一脸慈祥地对我微笑，用他手上的木棍给予了我最亲切的问候~</li>
+<li>“你的好朋友呢？~”</li>
+</ol>
+<ul>
+<li>
+<p>在考试的前一周，我问一位英才的小学物化实验操作考试水不水，他委婉地告诉我：<br>
+| <font size="3" color="white"> 监考老师不是看天花板就是看地板~</font></p>
+</li>
+<li>
+<p>物理抽签（好吧，我没有体验到抽签的快乐，被动选择)：23 平面镜成像<br>
+考试外面的老师对我说道：“来前面3个同学和我进去做平面镜成像实验，赶快准备”）</p>
+</li>
+<li>
+<p>化学抽签（这东西一定要有信念，心中默念：氯化钠~）：22 称量6.5g的氯化钠</p>
+</li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[【中考游记】体育中考]]></title>
         <id>https://song-gan.github.io/post/zhong-kao-you-ji-ti-yu-zhong-kao/</id>
@@ -1353,100 +1393,6 @@ int main()
 记忆化正如字面意思，记录每个状态的搜索结果，在重复遍历一个状态时直接检索并返回。这就好比我们对图进行深度优先遍历时，标记一个节点时是否已经被访问过，可以直接调用记录的数据，就可以节省再次重复计算的时间。</p>
 </li>
 </ol>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[【OI学习笔记】二分算法]]></title>
-        <id>https://song-gan.github.io/post/oi-xue-xi-bi-ji-er-fen-suan-fa/</id>
-        <link href="https://song-gan.github.io/post/oi-xue-xi-bi-ji-er-fen-suan-fa/">
-        </link>
-        <updated>2022-02-26T12:17:59.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="二分算法">二分算法</h2>
-<ul>
-<li>
-<p>二分的本质并不是单调性，如果有单调性一定可以二分，可以二分但不一定有单调性。</p>
-</li>
-<li>
-<p>二分的本质：边界。</p>
-</li>
-</ul>
-<h2 id="整数二分">整数二分</h2>
-<h3 id="整数二分算法模板">整数二分算法模板：</h3>
-<ul>
-<li>
-<p>二分模板一共有两个，分别适用于不同情况。</p>
-</li>
-<li>
-<p>算法思路：假设目标值在闭区间[l, r]中， 每次将区间长度缩小一半，当l = r时，我们就找到了目标值。</p>
-</li>
-</ul>
-<h4 id="版本1">版本1</h4>
-<ul>
-<li>当我们将区间[l, r]划分成[l, mid]和[mid + 1, r]时，其更新操作是r = mid或者l = mid + 1;计算mid时不需要加1。</li>
-</ul>
-<pre><code class="language-cpp">int bsearch_1(int l, int r)
-{
-	while (l &lt; r)
-	{
-		int mid = l + r &gt;&gt; 1;
-		if (check(mid))
-			r = mid;
-		else
-			l = mid + 1;
-	}
-	return l;
-}
-</code></pre>
-<h4 id="版本2">版本2</h4>
-<ul>
-<li>当我们将区间[l, r]划分成[l, mid - 1]和[mid, r]时，其更新操作是r = mid - 1或者l = mid;，此时为了防止死循环，计算mid时需要加1。</li>
-</ul>
-<pre><code class="language-cpp">int bsearch_2(int l, int r)
-{
-	while (l &lt; r)
-	{
-		int mid = l + r + 1 &gt;&gt; 1;
-		if (check(mid))
-			l = mid;
-		else
-			r = mid - 1;
-	}
-	return l;
-}
-</code></pre>
-<h3 id="整数二分算法模板-模板题-acwing-789-数的范围">整数二分算法模板 —— 模板题  <a href="https://www.acwing.com/problem/content/791/">AcWing 789. 数的范围</a></h3>
-<pre><code class="language-cpp">bool check(int x)
-{ 
-	/* ... */
-} // 检查x是否满足某种性质
-
-// 区间[l, r]被划分成[l, mid]和[mid + 1, r]时使用：
-int bsearch_1(int l, int r)
-{
-	while (l &lt; r)
-	{
-		int mid = l + r &gt;&gt; 1;
-		if (check(mid))
-			r = mid; // check()判断mid是否满足性质
-		else
-			l = mid + 1;
-	}
-	return l;
-}
-// 区间[l, r]被划分成[l, mid - 1]和[mid, r]时使用：
-int bsearch_2(int l, int r)
-{
-	while (l &lt; r)
-	{
-		int mid = l + r + 1 &gt;&gt; 1;
-		if (check(mid))
-			l = mid;
-		else
-			r = mid - 1;
-	}
-	return l;
-}
-</code></pre>
 ]]></content>
     </entry>
 </feed>
